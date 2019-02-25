@@ -2,4 +2,4 @@
 
 Create infra-as-code documentation of Active Directory and DNS
 
-Authored by 
+Authored by Mateusz Czerniawski
