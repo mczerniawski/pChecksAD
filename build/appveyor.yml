@@ -1,0 +1,48 @@
+# See http://www.appveyor.com/docs/appveyor-yml for many more options
+
+#Publish to PowerShell Gallery with this key
+environment:
+  PSGalleryNugetApiKey:
+    secure: wH1ALRNiAuiA7dS5i4I5dPsQzuoCuV0yHf7Pe/HQn8BOJ/5wSdNqy4aa+N7J2kbn
+  GithubAuthToken:
+    secure: gN4n/aBQ95awEEv4QPGlV810lNHSqFpxFmXCCTj31wSpvadZ8SMtH9PrxlTYyb9j
+
+image: Visual Studio 2017
+
+skip_commits:
+  files:
+    - README.md
+
+init:
+  # Set "build version number" to "tag name" (when tagged) and set $env:projectName to the name of the repository
+  - ps: >-
+      if ($env:APPVEYOR_REPO_TAG -eq "true")
+      {
+        Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME"
+        $env:PackageVersion = "$env:APPVEYOR_REPO_TAG_NAME" 
+      }
+      $env:ProjectName = ($env:APPVEYOR_REPO_NAME -split '/')[1]
+      
+install:
+  - cmd: git submodule update --init --recursive  
+
+build_script:
+  - ps: . .\build\build.ps1
+
+artifacts:
+  - path: $(ProjectName)
+
+deploy:
+  - provider: GitHub
+    auth_token: $(GithubAuthToken)
+    draft: true
+    prerelease: false
+    on:
+      branch: master
+      appveyor_repo_tag: true
+
+after_deploy:
+  - ps: Publish-Module -Path (Join-Path -Path $env:APPVEYOR_BUILD_FOLDER -ChildPath $env:ProjectName) -NuGetApiKey $env:PSGalleryNugetApiKey -Verbose -Force
+    on:
+      branch: master
+      appveyor_repo_tag: true
