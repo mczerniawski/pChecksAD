@@ -44,15 +44,15 @@ function New-BaselineAD {
         #endregion
         #region Get Configuration from environment
         $Configuration = [ordered]@{
-            NonNodeData = @{}
-            AllNodes  = @()
+            General = @{}
+            Nodes  = @()
         }
-        $Configuration.NonNodeData = Get-BaselineConfigurationAD @queryParams
+        $Configuration.General = Get-BaselineConfigurationAD @queryParams
         #endregion
         #region node configuration
         $counter = 1
-        $nodesCount = ($Configuration.NonNodeData.GlobalCatalogs.Name).Count
-        $Configuration.AllNodes = foreach ($node in $Configuration.NonNodeData.GlobalCatalogs.Name) {
+        $nodesCount = ($Configuration.General.GlobalCatalogs.Name).Count
+        $Configuration.Nodes = foreach ($node in $Configuration.General.GlobalCatalogs.Name) {
             Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Host {$node} Environment configuration" -PercentComplete (100 / $nodesCount * $counter)
             $sessionParams = @{
                 ComputerName = $node

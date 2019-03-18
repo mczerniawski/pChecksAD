@@ -57,16 +57,16 @@ Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder 
 This will create a folder structure:
 
 ```
-├───AllNodes
+├───Nodes
 │       DC1.CONTOSO.COM.Configuration.json
 │       DC2.CONTOSO.COM.Configuration.json
-└───NonNodeData
+└───General
         CONTOSO.COM.Configuration.json
 ```
 
 where:
-- `AllNodes` will contain configuration of each node (Domain Controller)
-- `NonNodeData` will contain service (Forest,Domain) configuration
+- `Nodes` will contain configuration of each node (Domain Controller)
+- `General` will contain service (Forest,Domain) configuration
 
 
 # Full code
