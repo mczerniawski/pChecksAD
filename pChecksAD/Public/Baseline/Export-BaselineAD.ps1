@@ -1,4 +1,5 @@
 function Export-BaselineAD {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [hashTable]
