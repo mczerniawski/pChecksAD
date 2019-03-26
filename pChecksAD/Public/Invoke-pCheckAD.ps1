@@ -1,20 +1,36 @@
 function Invoke-pCheckAD {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$false, HelpMessage = 'Path to Checks Index File')]
+        [Parameter(Mandatory = $false, HelpMessage = 'Path to Checks Index File')]
         [ValidateScript( {Test-Path -Path $_ -PathType Leaf})]
         [System.String]
         $pChecksIndexFilePath,
 
-        [Parameter(Mandatory=$false, HelpMessage = 'Folder with Pester tests')]
+        [Parameter(Mandatory = $false, HelpMessage = 'Folder with Pester tests')]
         [ValidateScript( {Test-Path -Path $_ -PathType Container})]
         [System.String]
         $pChecksFolderPath,
+
+
+        [Parameter(Mandatory = $false, HelpMessage = 'Folder with current configuration (baseline)')]
+        [ValidateScript( {Test-Path -Path $_ -PathType Container})]
+        [System.String]
+        $CurrentConfiguration,
 
         [Parameter(Mandatory = $false, HelpMessage = 'test type for Pester')]
         [ValidateSet('Simple', 'Comprehensive')]
         [string[]]
         $TestType,
+
+        [Parameter(Mandatory = $false, HelpMessage = 'Node to test')]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $NodeName,
+
+        [Parameter(Mandatory = $false, HelpMessage = 'hashtable with pester Configuration',
+            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
+        [hashtable]
+        $pCheckParameters,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
@@ -54,7 +70,6 @@ function Invoke-pCheckAD {
 
         [Parameter(Mandatory = $false, HelpMessage = 'FileName for Pester test results',
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
-        [ValidateScript( {Test-Path $_ -Type Leaf -IsValid})]
         [String]
         $FilePrefix,
 
@@ -78,43 +93,35 @@ function Invoke-pCheckAD {
         [string[]]
         $TestTarget
     )
-    process{
+    process {
 
-
-        <# $invokepCheckSplat = @{
-            pChecksIndexPath = $pChecksIndexPath
-            pChecksFolderPath = $pChecksPath
-            Tag= 'Operational'
-            TestType = 'Simple'
-            TestTarget = 'General'
-            #NodeName = @('OBJPLSDC0','OBJPLPDC0')
-        #}
-        #>
-        if(-not ($PSBoundParameters.ContainsKey('pChecksIndexFilePath'))){
+        if (-not ($PSBoundParameters.ContainsKey('pChecksIndexFilePath'))) {
             $pChecksIndexPathFinal = Get-pChecksIndexPath
-            $PSBoundParameters.Add('pChecksIndexFilePath',$pChecksIndexPathFinal)
+            $PSBoundParameters.Add('pChecksIndexFilePath', $pChecksIndexPathFinal)
         }
         else {
             $pChecksIndexPathFinal = Get-pChecksIndexPath -pChecksIndexFilePath $pChecksIndexFilePath
-            $PSBoundParameters.pChecksIndexFilePath=$pChecksIndexPathFinal
+            $PSBoundParameters.pChecksIndexFilePath = $pChecksIndexPathFinal
         }
 
-        if(-not ($PSBoundParameters.ContainsKey('pChecksFolderPath'))){
+        if (-not ($PSBoundParameters.ContainsKey('pChecksFolderPath'))) {
             $pChecksFolderPathFinal = Get-pChecksFolderPath
-            $PSBoundParameters.Add('pChecksFolderPath',$pChecksFolderPathFinal)
+            $PSBoundParameters.Add('pChecksFolderPath', $pChecksFolderPathFinal)
         }
         else {
             $pChecksFolderPathFinal = Get-pChecksFolderPath -pChecksFolderPath $pChecksFolderPath
             $PSBoundParameters.pChecksFolderPath = $pChecksFolderPathFinal
         }
-        if(-not $PSBoundParameters.ContainsKey('TestType')){
+        if (-not $PSBoundParameters.ContainsKey('TestType')) {
             $PSBoundParameters.TestType = @('Simple', 'Comprehensive')
         }
-        if(-not $PSBoundParameters.ContainsKey('TestTarget')){
+        if (-not $PSBoundParameters.ContainsKey('TestTarget')) {
             $PSBoundParameters.TestTarget = @('Nodes', 'General')
         }
 
+        #jezeli NodeName podane to sprawdz czy w ogole jest sens sprawdzac konrketne nody?
 
+        #jezeli current configuration to co z $checkparameters?
         Invoke-pCheck @PSBoundParameters
     }
 }
