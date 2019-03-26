@@ -11,11 +11,10 @@ function Invoke-pCheckAD {
         [System.String]
         $pChecksFolderPath,
 
-
         [Parameter(Mandatory = $false, HelpMessage = 'Folder with current configuration (baseline)')]
         [ValidateScript( {Test-Path -Path $_ -PathType Container})]
         [System.String]
-        $CurrentConfiguration,
+        $CurrentConfigurationFolderPath,
 
         [Parameter(Mandatory = $false, HelpMessage = 'test type for Pester')]
         [ValidateSet('Simple', 'Comprehensive')]
@@ -31,6 +30,11 @@ function Invoke-pCheckAD {
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
         [hashtable]
         $pCheckParameters,
+
+        [Parameter(Mandatory = $false, HelpMessage = 'Provide Credential',
+            ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [System.Management.Automation.Credential()][System.Management.Automation.PSCredential]
+        $Credential = [System.Management.Automation.PSCredential]::Empty,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
@@ -119,9 +123,20 @@ function Invoke-pCheckAD {
             $PSBoundParameters.TestTarget = @('Nodes', 'General')
         }
 
-        #jezeli NodeName podane to sprawdz czy w ogole jest sens sprawdzac konrketne nody?
+        if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
+            $CurrentConfiguration = Import-BaselineConfiguration -BaselineConfigurationFolder $CurrentConfigurationFolderPath
+            $PSBoundParameters.Remove('CurrentConfigurationFolderPath')
+            $PSBoundParameters.Add('CurrentConfiguration', $CurrentConfiguration)
+        }
 
-        #jezeli current configuration to co z $checkparameters?
+        if (-not $PSBoundParameters.ContainsKey('NodeName') -and $PSBoundParameters['TestTarget'] -match 'Nodes') {
+            #Get All GlobalCatalogs
+            Write-Verbose "No Node provided. Querying AD for all Global Catalogs"
+            $allGlobalCatalogs = Get-ADForest | Select-Object -ExpandProperty GlobalCatalogs
+            Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
+            $PSBoundParameters.Add('NodeName', @($allGlobalCatalogs))
+        }
+
         Invoke-pCheck @PSBoundParameters
     }
 }

@@ -16,34 +16,7 @@
             ]
         },
         {
-        "DiagnosticFile" : "AD.Simple.Operational.General.Tests.1.ps1",
-        "TestType" : "Simple",
-        "Tag" : [
-            "Operational",
-            "Domains",
-            "General",
-            "Sites"
-        ],
-        "TestTarget" : "General",
-        "Parameters" : [
-            "ComputerName",
-            "Credential"
-        ]
-        },
-        {
             "DiagnosticFile" : "AD.Simple.Operational.Node.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
-                "Operational"
-            ],
-            "TestTarget" : "Nodes",
-            "Parameters" : [
-                "ComputerName",
-                "Credential"
-            ]
-        },
-        {
-            "DiagnosticFile" : "AD.Simple.Operational.Node.Tests.1.ps1",
             "TestType" : "Simple",
             "Tag" : [
                 "Operational"
