@@ -122,21 +122,34 @@ function Invoke-pCheckAD {
         if (-not $PSBoundParameters.ContainsKey('TestTarget')) {
             $PSBoundParameters.TestTarget = @('Nodes', 'General')
         }
-
+        #region if Configuration path provided - read configuration and add tag Configuration
         if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
             $CurrentConfiguration = Import-BaselineConfiguration -BaselineConfigurationFolder $CurrentConfigurationFolderPath
-            $PSBoundParameters.Remove('CurrentConfigurationFolderPath')
+            [void]($PSBoundParameters.Remove('CurrentConfigurationFolderPath'))
             $PSBoundParameters.Add('CurrentConfiguration', $CurrentConfiguration)
+            if($PSBoundParameters.ContainsKey('Tag')){
+                $PSBoundParameters['Tag'] = @($Tag) + @('Configuration')
+            }
+            else {
+                $PSBoundParameters.Add('Tag', 'Configuration')
+            }
         }
+        #endregion
 
+        #region no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
         if (-not $PSBoundParameters.ContainsKey('NodeName') -and $PSBoundParameters['TestTarget'] -match 'Nodes') {
             #Get All GlobalCatalogs
             Write-Verbose "No Node provided. Querying AD for all Global Catalogs"
-            $allGlobalCatalogs = Get-ADForest | Select-Object -ExpandProperty GlobalCatalogs
+            try {
+                $allGlobalCatalogs = Get-ADForest -ErrorAction Stop | Select-Object -ExpandProperty GlobalCatalogs
+            }
+            catch {
+                Write-Error -Message "$($_.Exception.Message).. Aborting all checks!"
+                Break
+            }
             Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
             $PSBoundParameters.Add('NodeName', @($allGlobalCatalogs))
         }
-
         Invoke-pCheck @PSBoundParameters
     }
 }

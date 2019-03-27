@@ -18,13 +18,38 @@ $Baseline = New-BaselineAD @queryParams
 
 Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 
-
-$pesterParams = @{
-    Script = @{
-        Path       = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Checks\Simple\AD.Simple.Operational.Tests.ps1'
-        Parameters = $queryParams
+$invokepCheckSplat = @{
+        #pChecksIndexFilePath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Index\AD.Checks.Index.json'
+        #pChecksFolderPath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Checks\'
+        #Tag= @('Domain','General')
+        #TestType = 'Simple'
+        #TestTarget = 'Nodes'
+        #NodeName = @('OBJPLSDC0','OBJPLPDC0')
+        #pCheckParameters = @{
+        #    ComputerName = ' OBJPLPDC0'
+        #    Credential = $creds
+        #}
+        #FilePrefix = 'SomePrefix'
+        #IncludeDate = $true
+        #NodeName = @('OBJPLPDC0','OBJPLSDC0')
+        #OutputFolder = 'C:\AdminTools\Tests'
+        #Verbose = $true
+        #Credential = $Credential
+        #CurrentConfigurationFolderPath = 'C:\AdminTools\Tests\BaselineAD_New'
+        #POdanie sciezki oznacza Tag +='Configuration'
     }
-}
-$results = Invoke-Pester @pesterParams -PassThru -Show All
+
+Invoke-pCheckAD @invokepCheckSplat
+
+
+#ToDo:
+# pcheckParameters
+# obsluga nodow dla Parameters
+#write Log
+# write Azure
+# Pester xml output
+# Invoke-pChecksReportUnit
+
+
 
 ```
