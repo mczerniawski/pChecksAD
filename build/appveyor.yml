@@ -3,9 +3,9 @@
 #Publish to PowerShell Gallery with this key
 environment:
   PSGalleryNugetApiKey:
-    secure: wH1ALRNiAuiA7dS5i4I5dPsQzuoCuV0yHf7Pe/HQn8BOJ/5wSdNqy4aa+N7J2kbn
+    secure: AJ1xY5BEXolUuZ8Oxo193+vuK9ilZwWIg2J7SU9Nj5xiO7pOCsKnSvofauJqkoHe
   GithubAuthToken:
-    secure: gN4n/aBQ95awEEv4QPGlV810lNHSqFpxFmXCCTj31wSpvadZ8SMtH9PrxlTYyb9j
+    secure: ehOfR3elu2vZfzPXiEMi63buUJOAa5BqjOg54BdlEeHubm3lCxYrDzBeRywo9Q/w
 
 image: Visual Studio 2017
 
@@ -19,12 +19,12 @@ init:
       if ($env:APPVEYOR_REPO_TAG -eq "true")
       {
         Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME"
-        $env:PackageVersion = "$env:APPVEYOR_REPO_TAG_NAME" 
+        $env:PackageVersion = "$env:APPVEYOR_REPO_TAG_NAME"
       }
       $env:ProjectName = ($env:APPVEYOR_REPO_NAME -split '/')[1]
-      
+
 install:
-  - cmd: git submodule update --init --recursive  
+  - cmd: git submodule update --init --recursive
 
 build_script:
   - ps: . .\build\build.ps1
