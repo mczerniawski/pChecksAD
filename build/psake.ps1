@@ -24,7 +24,7 @@ Task Init {
     "`n"
 }
 
-Task Test -Depends Init  {
+Task Test -Depends Init {
     $lines
 
     if (!(Test-Path -Path $ProjectRoot\Tests)) {

@@ -1,5 +1,6 @@
 function Get-ConfigurationDomainGeneral {
     [CmdletBinding()]
+    [OutputType([ordered])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]
@@ -23,10 +24,10 @@ function Get-ConfigurationDomainGeneral {
         $currentADdomain = Get-ADDomain @domainQueryParams
         if ($currentADdomain) {
             [ordered]@{
-                ChildDomains             = @($currentADdomain.ChildDomains)
-                DNSRoot                  = $currentADdomain.DNSRoot
-                DomainMode               = $currentADdomain.DomainMode.ToString()
-                FSMORoles                = @{
+                ChildDomains  = @($currentADdomain.ChildDomains)
+                DNSRoot = $currentADdomain.DNSRoot
+                DomainMode                      = $currentADdomain.DomainMode.ToString()
+                FSMORoles                       = @{
                     InfrastructureMaster = $currentADdomain.InfrastructureMaster
                     RIDMaster            = $currentADdomain.RIDMaster
                     PDCEmulator          = $currentADdomain.PDCEmulator

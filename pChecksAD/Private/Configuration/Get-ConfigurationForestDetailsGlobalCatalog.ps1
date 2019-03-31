@@ -1,4 +1,4 @@
-function Get-ConfigurationForestDetailsGlobalCatalogs {
+function Get-ConfigurationForestDetailsGlobalCatalog {
     <#
     .SYNOPSIS
     Short description
@@ -20,6 +20,7 @@ function Get-ConfigurationForestDetailsGlobalCatalogs {
     #>
 
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]

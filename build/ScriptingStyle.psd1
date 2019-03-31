@@ -1,6 +1,6 @@
 @{
     Severity = @('Error', 'Warning', 'Information')
-    IncludeRules = @(   
+    IncludeRules = @(
                    'PSAvoidDefaultValueForMandatoryParameter',
                    'PSAvoidDefaultValueSwitchParameter',
                    'PSAvoidGlobalAliases',
@@ -64,11 +64,12 @@
         }
 
         PSUseConsistentWhitespace = @{
-            Enable = $true
+            Enable = $false
             CheckOpenBrace = $true
             CheckOpenParen = $true
             CheckOperator = $true
             CheckSeparator = $true
+            CheckInnerBrace = $false
         }
     }
 }

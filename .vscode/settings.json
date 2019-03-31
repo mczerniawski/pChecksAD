@@ -4,5 +4,7 @@
     "powershell.codeFormatting.newLineAfterCloseBrace": true,
     "powershell.codeFormatting.openBraceOnSameLine": true,
     "powershell.codeFormatting.whitespaceAroundOperator": true,
-    "powershell.codeFormatting.whitespaceBeforeOpenBrace": true
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
+    "powershell.WhitespaceInsideBrace" : true,
+    "powershell.WhitespaceAroundPipe" : true
 }

@@ -1,5 +1,6 @@
 function Get-ConfigurationDomainLastBackup {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]

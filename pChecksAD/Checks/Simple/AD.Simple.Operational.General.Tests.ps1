@@ -37,7 +37,7 @@ Describe "Verify domains configuration in forest {$($CurrentConfiguration.Genera
             @($PSItem.HighGroups).Foreach{
 
                 it "Verify [$($PSItem.Name)] group should only contain [Administrator] account" {
-                    Get-ADGroupMember -Identity $PSItem.Name @queryCheckParams | Where-Object {$PSItem.samaccountname -ne 'Administrator'} |
+                    Get-ADGroupMember -Identity $PSItem.Name @queryCheckParams | Where-Object { $PSItem.samaccountname -ne 'Administrator' } |
                         Should -BeNullOrEmpty
                 }
             }

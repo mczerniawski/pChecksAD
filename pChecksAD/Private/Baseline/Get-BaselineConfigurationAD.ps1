@@ -20,6 +20,7 @@ function Get-BaselineConfigurationAD {
     #>
 
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -56,10 +57,10 @@ function Get-BaselineConfigurationAD {
             $netQueryParams.Credential = $Credential
         }
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Environment configuration - Global Catalogs" -PercentComplete 20
-        $ForestConfig.GlobalCatalogs = Get-ConfigurationForestDetailsGlobalCatalogs @netQueryParams
+        $ForestConfig.GlobalCatalogs = Get-ConfigurationForestDetailsGlobalCatalog @netQueryParams
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Environment configuration - Sites" -PercentComplete 40
 
-        $ForestConfig.Sites = Get-ConfigurationForestDetailsSites @netQueryParams
+        $ForestConfig.Sites = Get-ConfigurationForestDetailsSite @netQueryParams
         #endregion
         #region domain properties
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} AD Domains configuration" -PercentComplete 50
@@ -76,7 +77,7 @@ function Get-BaselineConfigurationAD {
             if ($PSBoundParameters.ContainsKey('Credential')) {
                 $domainQueryParams.Credential = $Credential
             }
-            Get-ConfigurationForestDetailsDomains @domainQueryParams
+            Get-ConfigurationForestDetailsDomain @domainQueryParams
         }
         #endregion
         #region Trust properties

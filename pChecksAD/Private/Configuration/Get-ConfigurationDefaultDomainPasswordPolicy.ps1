@@ -1,5 +1,6 @@
 function Get-ConfigurationDefaultDomainPasswordPolicy {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]

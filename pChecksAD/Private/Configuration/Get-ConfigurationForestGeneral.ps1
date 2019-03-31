@@ -1,5 +1,6 @@
 function Get-ConfigurationForestGeneral {
     [CmdletBinding()]
+    [OutputType([ordered])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]

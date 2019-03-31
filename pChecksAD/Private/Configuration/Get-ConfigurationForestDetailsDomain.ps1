@@ -1,5 +1,6 @@
-function Get-ConfigurationForestDetailsDomains {
+function Get-ConfigurationForestDetailsDomain {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]

@@ -20,6 +20,7 @@ function Get-ConfigurationDHCPAuthorizedInAD {
     #>
 
     [CmdletBinding()]
+    [OutputType([System.Array])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]

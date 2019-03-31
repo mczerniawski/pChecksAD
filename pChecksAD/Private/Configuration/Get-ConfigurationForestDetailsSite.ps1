@@ -1,4 +1,4 @@
-function Get-ConfigurationForestDetailsSites {
+function Get-ConfigurationForestDetailsSite {
     <#
     .SYNOPSIS
     Short description
@@ -20,6 +20,7 @@ function Get-ConfigurationForestDetailsSites {
     #>
 
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]

@@ -3,7 +3,7 @@
     $Private = @( Get-ChildItem -Recurse -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue)
 
 #Dot source the files
-    Foreach($import in @($Public + $Private)) {
+    Foreach ($import in @($Public + $Private)) {
         Try {
             Write-Verbose -Message "  Importing $($import.BaseName)"
             . $import.fullname

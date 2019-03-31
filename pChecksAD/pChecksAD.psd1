@@ -95,7 +95,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Pester','PowerShell','OVF','Active Directory','DNS')
+        Tags = @('Pester', 'PowerShell', 'OVF', 'Active Directory', 'DNS')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/mczerniawski/pChecksAD/blob/master/LICENSE.txt'

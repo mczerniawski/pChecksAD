@@ -23,6 +23,7 @@ function New-BaselineAD {
     #>
 
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     param(
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -36,8 +37,8 @@ function New-BaselineAD {
     process {
         #region Get Configuration from environment
         $Configuration = [ordered]@{
-            General = @{}
-            Nodes  = @()
+            General = @{ }
+            Nodes   = @( )
         }
         $Configuration.General = Get-BaselineConfigurationAD @PSBoundParameters
         #endregion
@@ -48,7 +49,7 @@ function New-BaselineAD {
             Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Host {$node} Environment configuration" -PercentComplete (100 / $nodesCount * $counter)
             $sessionParams = @{
                 ComputerName = $node
-                Name  = "Baseline-$node"
+                Name         = "Baseline-$node"
             }
             if ($PSBoundParameters.ContainsKey('Credential')) {
                 $sessionParams.Credential = $Credential

@@ -1,5 +1,6 @@
 function Get-ConfigurationDomainTrust {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]
