@@ -1,55 +1,70 @@
+# how to run this
+
+A sample script that demonstrated a few options
+
+## Import modules and Create Baseline
 
 ```powershell
-Import-Module pChecksTools -Force
-Import-Module pChecksAD -Force
+$creds = Get-Credential
 
-
-#$Credential = Get-Credential
 $queryParams = @{
-    ComputerName  = 'objplpdc0'
-    Credential = $Credential
+    ComputerName = 'objplpdc0'
+    Credential   = $creds
 
 }
 $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD_New'
-Import-Module C:\Repos\Private-GIT\pChecksTools\pChecksTools -Force
-Import-Module C:\Repos\Private-GIT\pChecksAD\pChecksAD -Force
+Import-Module C:\Repos\pChecksTools\pChecksTools -Force
+Import-Module C:\Repos\pChecksAD\pChecksAD -Force
 
 $Baseline = New-BaselineAD @queryParams
-
 Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
+```
 
-$invokepCheckSplat = @{
-        #pChecksIndexFilePath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Index\AD.Checks.Index.json'
-        #pChecksFolderPath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Checks\'
-        #Tag= @('Domain','General')
-        #TestType = 'Simple'
-        #TestTarget = 'Nodes'
-        #NodeName = @('OBJPLSDC0','OBJPLPDC0')
-        #pCheckParameters = @{
-        #    ComputerName = ' OBJPLPDC0'
-        #    Credential = $creds
-        #}
-        #FilePrefix = 'SomePrefix'
-        #IncludeDate = $true
-        #NodeName = @('OBJPLPDC0','OBJPLSDC0')
-        #OutputFolder = 'C:\AdminTools\Tests'
-        #Verbose = $true
-        #Credential = $Credential
-        #CurrentConfigurationFolderPath = 'C:\AdminTools\Tests\BaselineAD_New'
-        #POdanie sciezki oznacza Tag +='Configuration'
-    }
+## Verify proper file by importing configuration
 
-Invoke-pCheckAD @invokepCheckSplat
+```powershell
+$BaselineTest = Import-BaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolder
 
+Compare-Object -ReferenceObject $Baseline.Nodes -DifferenceObject $BaselineTest.Nodes
+foreach ($hashtable in $Baseline.General.GetEnumerator()) {
+    Compare-Object -ReferenceObject $hashtable -DifferenceObject ($BaselineTest.General.GetEnumerator() | Where-Object {$_.Name -eq $hashtable.name} )
+}
+```
 
-#ToDo:
-# pcheckParameters
-# obsluga nodow dla Parameters
-#write Log
-# write Azure
-# Pester xml output
-# Invoke-pChecksReportUnit
+## Run checks
 
+```powershell
+$creds = Get-Credential
+Import-Module C:\Repos\Private-GIT\pChecksTools\pChecksTools -Force
+Import-Module C:\Repos\Private-GIT\pChecksAD\pChecksAD -Force
+$invokepChecksSplat = @{
+    #pChecksIndexFilePath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Index\AD.Checks.Index.json'
+    #pChecksFolderPath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Checks\'
+    #Tag= @('Domains')
+    #TestType = 'Simple'
+    #TestTarget = 'Nodes'
+    #NodeName = @('Node1','Node2')
+    #FilePrefix = 'YourFileNamePrefix'
+    #IncludeDate = $true
+    #OutputFolder = 'C:\AdminTools\Tests'
+    Verbose = $true
+    Credential      = $creds
+    #CurrentConfigurationFolderPath = 'C:\AdminTools\Tests\BaselineAD_New' #Adding this means adding tag 'Configuration' $Tag +='Configuration'
+    Show            = 'All'
+    #WriteToEventLog = $true
+    #    EventSource     = 'pChecksAD'
+    #    EventIDBase     = 1000
+    #WriteToAzureLog = $true
+    #   Identifier          = $Identifier #Name of checks like pChecksAD
+    #   CustomerId          = 'your Customer ID in Azure Log Analytics'
+    #   SharedKey           = 'your shared key in Azure Log Analytics'
+}
 
+Invoke-pChecksAD @invokepChecksSplat
+```
 
+## Create ReportUnit reports
+
+```powershell
+Invoke-pChecksReportUnit -InputFolder $invokepChecksSplat.OutputFolder
 ```

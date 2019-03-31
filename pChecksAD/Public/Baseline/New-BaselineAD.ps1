@@ -34,20 +34,12 @@ function New-BaselineAD {
     )
 
     process {
-        #region PSBound initialization
-        $queryParams = @{
-            ComputerName = $ComputerName
-        }
-        if ($PSBoundParameters.ContainsKey('Credential')) {
-            $queryParams.Credential = $Credential
-        }
-        #endregion
         #region Get Configuration from environment
         $Configuration = [ordered]@{
             General = @{}
             Nodes  = @()
         }
-        $Configuration.General = Get-BaselineConfigurationAD @queryParams
+        $Configuration.General = Get-BaselineConfigurationAD @PSBoundParameters
         #endregion
         #region node configuration
         $counter = 1

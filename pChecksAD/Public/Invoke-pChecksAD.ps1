@@ -1,4 +1,4 @@
-function Invoke-pCheckAD {
+function Invoke-pChecksAD {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Path to Checks Index File')]
@@ -55,6 +55,11 @@ function Invoke-pCheckAD {
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
         [switch]
         $WriteToAzureLog,
+
+        [Parameter(Mandatory = $false, HelpMessage='Name for cheks to store in Azure Log Analytics',
+        ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
+        [string]
+        $Identifier,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
@@ -149,6 +154,14 @@ function Invoke-pCheckAD {
             }
             Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
             $PSBoundParameters.Add('NodeName', @($allGlobalCatalogs))
+        }
+        #endregion
+
+        if($PSBoundParameters.ContainsKey('WriteToAzureLog')){
+            if(-not $PSBoundParameters.ContainsKey('Identifier')){
+                Write-Verbose -Message "No identifier for checks provided. Set it to {pChecksAD}."
+                $PSBoundParameters.Add('Identifier', 'pChecksAD')
+            }
         }
         Invoke-pCheck @PSBoundParameters
     }

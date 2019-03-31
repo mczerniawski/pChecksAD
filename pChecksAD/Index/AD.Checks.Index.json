@@ -14,30 +14,6 @@
                 "ComputerName",
                 "Credential"
             ]
-        },
-        {
-            "DiagnosticFile" : "AD.Simple.Operational.Node.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
-                "Operational"
-            ],
-            "TestTarget" : "Nodes",
-            "Parameters" : [
-                "ComputerName",
-                "Credential"
-            ]
-        },
-        {
-            "DiagnosticFile" : "AD.Simple.Configuration.General.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
-                "Configuration"
-            ],
-            "TestTarget" : "General",
-            "Parameters" : [
-                "Configuration",
-                "Credential"
-            ]
         }
     ]
 }

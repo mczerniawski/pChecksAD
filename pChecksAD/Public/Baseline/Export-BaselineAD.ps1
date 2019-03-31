@@ -12,6 +12,6 @@ function Export-BaselineAD {
         $BaselineConfigurationFolder
     )
     process {
-        Export-BaselineConfiguration -BaselineConfiguration $BaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolder
+        Export-BaselineConfiguration @PSBoundParameters
     }
 }
