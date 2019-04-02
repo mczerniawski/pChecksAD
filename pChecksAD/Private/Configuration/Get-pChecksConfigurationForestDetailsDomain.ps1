@@ -1,4 +1,4 @@
-function Get-ConfigurationForestDetailsDomain {
+function Get-pChecksConfigurationForestDetailsDomain {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param(
@@ -25,9 +25,9 @@ function Get-ConfigurationForestDetailsDomain {
             $domainQueryParams.Credential = $Credential
         }
         $domainConfig = @{}
-        $DomainConfig = Get-ConfigurationDomainGeneral @domainQueryParams
-        $DomainConfig.DHCPServers = Get-ConfigurationDHCPAuthorizedInAD @domainQueryParams
-        $DomainConfig.DomainDefaultPasswordPolicy = Get-ConfigurationDefaultDomainPasswordPolicy @domainQueryParams
+        $DomainConfig = Get-pChecksConfigurationDomainGeneral @domainQueryParams
+        $DomainConfig.DHCPServers = Get-pChecksConfigurationDHCPAuthorizedInAD @domainQueryParams
+        $DomainConfig.DomainDefaultPasswordPolicy = Get-pChecksConfigurationDefaultDomainPasswordPolicy @domainQueryParams
 
         $DomainConfig.HighGroups = foreach ($group in $HighGroups) {
             $groupMembers = Get-ADGroupMember -Identity $group @domainQueryParams

@@ -48,8 +48,8 @@ $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD'
 - and finally export:
 
 ```powershell
-$Baseline = New-BaselineAD @queryParams
-Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
+$Baseline = New-pChecksBaselineAD @queryParams
+Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
 
 ## Output
@@ -83,8 +83,8 @@ $queryParams = @{
 
 }
 $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD'
-$Baseline = New-BaselineAD @queryParams
-Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
+$Baseline = New-pChecksBaselineAD @queryParams
+Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
 
 

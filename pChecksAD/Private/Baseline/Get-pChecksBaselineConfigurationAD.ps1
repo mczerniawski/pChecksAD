@@ -1,4 +1,4 @@
-function Get-BaselineConfigurationAD {
+function Get-pChecksBaselineConfigurationAD {
     <#
     .SYNOPSIS
     Short description
@@ -48,7 +48,7 @@ function Get-BaselineConfigurationAD {
 
         #region Forest properties
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest configuration" -PercentComplete 5
-        $ForestConfig = Get-ConfigurationForestGeneral @queryParams
+        $ForestConfig = Get-pChecksConfigurationForestGeneral @queryParams
 
         $netQueryParams = @{
             ComputerName = $ComputerName
@@ -57,10 +57,10 @@ function Get-BaselineConfigurationAD {
             $netQueryParams.Credential = $Credential
         }
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Environment configuration - Global Catalogs" -PercentComplete 20
-        $ForestConfig.GlobalCatalogs = Get-ConfigurationForestDetailsGlobalCatalog @netQueryParams
+        $ForestConfig.GlobalCatalogs = Get-pChecksConfigurationForestDetailsGlobalCatalog @netQueryParams
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Environment configuration - Sites" -PercentComplete 40
 
-        $ForestConfig.Sites = Get-ConfigurationForestDetailsSite @netQueryParams
+        $ForestConfig.Sites = Get-pChecksConfigurationForestDetailsSite @netQueryParams
         #endregion
         #region domain properties
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} AD Domains configuration" -PercentComplete 50
@@ -77,12 +77,12 @@ function Get-BaselineConfigurationAD {
             if ($PSBoundParameters.ContainsKey('Credential')) {
                 $domainQueryParams.Credential = $Credential
             }
-            Get-ConfigurationForestDetailsDomain @domainQueryParams
+            Get-pChecksConfigurationForestDetailsDomain @domainQueryParams
         }
         #endregion
         #region Trust properties
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Trust configuration" -PercentComplete 80
-        $ForestConfig.Trusts = Get-ConfigurationDomainTrust  @queryParams
+        $ForestConfig.Trusts = Get-pChecksConfigurationDomainTrust  @queryParams
         #endregion
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Backup information" -PercentComplete 90
         $lastBackupQuery = @{
@@ -91,7 +91,7 @@ function Get-BaselineConfigurationAD {
         if ($PSBoundParameters.ContainsKey('Credential')) {
             $lastBackupQuery.Credential = $Credential
         }
-        $ForestConfig.Backup = Get-ConfigurationDomainLastBackup @lastBackupQuery
+        #$ForestConfig.Backup = Get-pChecksConfigurationDomainLastBackup @lastBackupQuery
 
         $ForestConfig
     }

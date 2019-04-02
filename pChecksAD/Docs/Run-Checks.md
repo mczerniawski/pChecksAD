@@ -16,14 +16,14 @@ $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD_New'
 Import-Module C:\Repos\pChecksTools\pChecksTools -Force
 Import-Module C:\Repos\pChecksAD\pChecksAD -Force
 
-$Baseline = New-BaselineAD @queryParams
-Export-BaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
+$Baseline = New-pChecksBaselineAD @queryParams
+Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
 
 ## Verify proper file by importing configuration
 
 ```powershell
-$BaselineTest = Import-BaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolder
+$BaselineTest = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolder
 
 Compare-Object -ReferenceObject $Baseline.Nodes -DifferenceObject $BaselineTest.Nodes
 foreach ($hashtable in $Baseline.General.GetEnumerator()) {

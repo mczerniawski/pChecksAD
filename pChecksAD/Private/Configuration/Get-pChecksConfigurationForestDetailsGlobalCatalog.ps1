@@ -1,4 +1,4 @@
-function Get-ConfigurationForestDetailsGlobalCatalog {
+function Get-pChecksConfigurationForestDetailsGlobalCatalog {
     <#
     .SYNOPSIS
     Short description

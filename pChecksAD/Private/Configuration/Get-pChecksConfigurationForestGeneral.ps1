@@ -1,6 +1,6 @@
-function Get-ConfigurationForestGeneral {
+function Get-pChecksConfigurationForestGeneral {
     [CmdletBinding()]
-    [OutputType([ordered])]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]

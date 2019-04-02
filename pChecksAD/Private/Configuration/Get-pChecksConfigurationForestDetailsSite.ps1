@@ -1,4 +1,4 @@
-function Get-ConfigurationForestDetailsSite {
+function Get-pChecksConfigurationForestDetailsSite {
     <#
     .SYNOPSIS
     Short description

@@ -1,4 +1,4 @@
-function Get-ConfigurationDefaultDomainPasswordPolicy {
+function Get-pChecksConfigurationDefaultDomainPasswordPolicy {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param(

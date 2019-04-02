@@ -1,4 +1,4 @@
-function Get-ConfigurationDomainLastBackup {
+function Get-pChecksConfigurationDomainLastBackup {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param(

@@ -11,6 +11,19 @@
             ],
             "TestTarget" : "General",
             "Parameters" : [
+                "Credential",
+                "CurrentConfiguration"
+            ]
+        },
+        {
+            "DiagnosticFile" : "AD.Simple.Operational.Nodes.Tests.ps1",
+            "TestType" : "Simple",
+            "Tag" : [
+                "Operational",
+                "Nodes"
+            ],
+            "TestTarget" : "Nodes",
+            "Parameters" : [
                 "ComputerName",
                 "Credential"
             ]

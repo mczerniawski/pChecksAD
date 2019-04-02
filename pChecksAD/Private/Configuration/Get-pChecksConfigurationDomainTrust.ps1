@@ -1,4 +1,4 @@
-function Get-ConfigurationDomainTrust {
+function Get-pChecksConfigurationDomainTrust {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param(

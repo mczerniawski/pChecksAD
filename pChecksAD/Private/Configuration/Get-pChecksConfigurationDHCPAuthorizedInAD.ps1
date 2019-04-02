@@ -1,4 +1,4 @@
-function Get-ConfigurationDHCPAuthorizedInAD {
+function Get-pChecksConfigurationDHCPAuthorizedInAD {
     <#
     .SYNOPSIS
     Short description

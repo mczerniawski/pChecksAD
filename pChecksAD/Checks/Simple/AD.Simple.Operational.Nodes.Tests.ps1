@@ -1,15 +1,15 @@
 ﻿param(
+    $ComputerName,
     [System.Management.Automation.PSCredential]$Credential,
-    [System.Collections.Hashtable]$CurrentConfiguration
+    [string[]]$TestTarget
 )
+$queryCheckParams = @{
+    Server     = $ComputerName
+    Credential = $Credential
+}
+$CurrentConfiguration = New-pChecksBaselineAD @PSBoundParameters
 Describe "Verify Active Directory services from domain controller {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'General') {
     @($CurrentConfiguration.General.GlobalCatalogs.Name).Foreach{
-        $queryCheckParams = @{
-            Server = $PSitem
-        }
-        if($PSBoundParameters.ContainsKey('Credential')){
-            $queryCheckParams.Credential = $Credential
-        }
         Context "Verify {$PSitem} connectivity in forest {$($CurrentConfiguration.General.Name)}" {
             it "Verify Domain Controller {$PSItem} is [online]" {
                 Test-Connection $PSItem -Count 1 -ErrorAction SilentlyContinue |
@@ -34,14 +34,9 @@ Describe "Verify Active Directory services from domain controller {$($CurrentCon
 }
 Describe "Verify domains configuration in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Domains') {
     @($CurrentConfiguration.General.Domains).Foreach{
-        $queryCheckParams = @{
-            Server = $PSitem.FSMORoles.PDCEmulator
-        }
-        if($PSBoundParameters.ContainsKey('Credential')){
-            $queryCheckParams.Credential = $Credential
-        }
         Context "Verify Crucial Groups membership" {
             @($PSItem.HighGroups).Foreach{
+
                 it "Verify [$($PSItem.Name)] group should only contain [Administrator] account" {
                     Get-ADGroupMember -Identity $PSItem.Name @queryCheckParams | Where-Object { $PSItem.samaccountname -ne 'Administrator' } |
                         Should -BeNullOrEmpty

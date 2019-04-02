@@ -1,4 +1,4 @@
-function Export-BaselineAD {
+function Export-pChecksBaselineAD {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -12,6 +12,6 @@ function Export-BaselineAD {
         $BaselineConfigurationFolder
     )
     process {
-        Export-BaselineConfiguration @PSBoundParameters
+        Export-pChecksBaselineConfiguration @PSBoundParameters
     }
 }

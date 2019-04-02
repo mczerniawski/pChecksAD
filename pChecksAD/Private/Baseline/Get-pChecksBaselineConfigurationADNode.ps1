@@ -1,10 +1,9 @@
-function Get-BaselineConfigurationADNode {
+function Get-pChecksBaselineConfigurationADNode {
 
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param(
-        [Parameter(Mandatory,
-            ParameterSetName = 'ComputerName')]
+        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $ComputerName,
@@ -13,10 +12,10 @@ function Get-BaselineConfigurationADNode {
         [ValidateNotNullOrEmpty()]
         [System.Management.Automation.PSCredential]
         $Credential
+
     )
     process {
-        if ($PSBoundParameters.ContainsKey('ComputerName')) {
-            $sessionParams = @{
+        $sessionParams = @{
                 ComputerName = $ComputerName
                 Name         = "Baseline-$ComputerName"
             }
@@ -24,20 +23,19 @@ function Get-BaselineConfigurationADNode {
                 $sessionParams.Credential = $Credential
             }
             $BaselinePSSession = New-PSSession @SessionParams
-        }
-        if ($PSBoundParameters.ContainsKey('PSSession')) {
-            $BaselinePSSession = $PSSession
-        }
+
         $NodeConfiguration = @{}
         Write-Verbose -Message "Reading configuration from host {$($BaselinePSSession.ComputerName)}"
 
         $hostEnvironment = Get-pChecksBaseHostInformation -PSSession $BaselinePSSession
         $NodeConfiguration.ComputerName = ('{0}.{1}' -f $hostEnvironment.ComputerName, $hostEnvironment.Domain)
         $NodeConfiguration.Domain = $hostEnvironment.Domain
-
+        $NodeConfiguration.Roles = Get-pChecksRolesConfiguration -PSSession $BaselinePSSession
+        $NodeConfiguration.NIC = Get-pChecksNetAdapterConfiguration -PSSession $BaselinePSSession
+        $NodeConfiguration.Team = Get-pChecksTeamingConfiguration -PSSession $BaselinePSSession
         $NodeConfiguration
-        if (-not ($PSBoundParameters.ContainsKey('PSSession'))) {
-            Remove-PSSession -Name $BaselinePSSession.Name -ErrorAction SilentlyContinue
-        }
+
+        Remove-PSSession -Name $BaselinePSSession.Name -ErrorAction SilentlyContinue
+
     }
 }

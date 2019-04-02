@@ -2,34 +2,39 @@ function Invoke-pChecksAD {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Path to Checks Index File')]
-        [ValidateScript( {Test-Path -Path $_ -PathType Leaf})]
+        [ValidateScript( { Test-Path -Path $_ -PathType Leaf })]
         [System.String]
         $pChecksIndexFilePath,
 
         [Parameter(Mandatory = $false, HelpMessage = 'Folder with Pester tests')]
-        [ValidateScript( {Test-Path -Path $_ -PathType Container})]
+        [ValidateScript( { Test-Path -Path $_ -PathType Container })]
         [System.String]
         $pChecksFolderPath,
 
         [Parameter(Mandatory = $false, HelpMessage = 'Folder with current configuration (baseline)')]
-        [ValidateScript( {Test-Path -Path $_ -PathType Container})]
+        [ValidateScript( { Test-Path -Path $_ -PathType Container })]
         [System.String]
-        $CurrentConfigurationFolderPath,
+        $BaselineConfigurationFolderPath,
 
         [Parameter(Mandatory = $false, HelpMessage = 'test type for Pester')]
         [ValidateSet('Simple', 'Comprehensive')]
         [string[]]
         $TestType,
 
+        [Parameter(Mandatory = $false, HelpMessage = 'Tag for Pester',
+            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
+        [string[]]
+        $Tag,
+
+        [Parameter(Mandatory = $false, HelpMessage = 'Target Type to test')]
+        [ValidateSet('Nodes', 'General')]
+        [string[]]
+        $TestTarget,
+
         [Parameter(Mandatory = $false, HelpMessage = 'Node to test')]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $NodeName,
-
-        [Parameter(Mandatory = $false, HelpMessage = 'hashtable with pester Configuration',
-            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
-        [hashtable]
-        $pCheckParameters,
 
         [Parameter(Mandatory = $false, HelpMessage = 'Provide Credential',
             ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -56,8 +61,8 @@ function Invoke-pChecksAD {
         [switch]
         $WriteToAzureLog,
 
-        [Parameter(Mandatory = $false, HelpMessage='Name for cheks to store in Azure Log Analytics',
-        ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $false, HelpMessage = 'Name for checks to store in Azure Log Analytics',
+            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
         [string]
         $Identifier,
 
@@ -73,7 +78,7 @@ function Invoke-pChecksAD {
 
         [Parameter(Mandatory = $false, HelpMessage = 'Folder with Pester test results',
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
-        [ValidateScript( {Test-Path $_ -Type Container -IsValid})]
+        [ValidateScript( { Test-Path $_ -Type Container -IsValid })]
         [String]
         $OutputFolder,
 
@@ -90,79 +95,300 @@ function Invoke-pChecksAD {
         [Parameter(Mandatory = $false, HelpMessage = 'Show Pester Tests on console',
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
         [String]
-        $Show,
-
-        [Parameter(Mandatory = $false, HelpMessage = 'Tag for Pester',
-            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
-        [string[]]
-        $Tag,
-
-        [Parameter(Mandatory = $false, HelpMessage = 'Target Type to test')]
-        [ValidateSet('Nodes', 'General')]
-        [string[]]
-        $TestTarget
+        $Show
     )
+    begin {
+        $pesterParams = @{
+            PassThru = $true
+        }
+        if ($PSBoundParameters.ContainsKey('Show')) {
+            $pesterParams.Show = $Show
+        }
+        else {
+            $pesterParams.Show = 'None'
+        }
+
+        #region get output file pester parameters
+        if ($PSBoundParameters.ContainsKey('OutputFolder')) {
+            $newpCheckFileNameSplat.OutputFolder = $OutputFolder
+            if ($PSBoundParameters.ContainsKey('FilePrefix')) {
+                $newpCheckFileNameSplat.FilePrefix = $FilePrefix
+            }
+            if ($PSBoundParameters.ContainsKey('IncludeDate')) {
+                $newpCheckFileNameSplat.IncludeDate = $true
+            }
+            $pesterParams.OutputFormat = 'NUnitXml'
+        }
+        #endregion
+    }
     process {
-
-        if (-not ($PSBoundParameters.ContainsKey('pChecksIndexFilePath'))) {
-            $pChecksIndexPathFinal = Get-pChecksIndexPath
-            $PSBoundParameters.Add('pChecksIndexFilePath', $pChecksIndexPathFinal)
+        #region Get index file
+        if ($PSBoundParameters.ContainsKey('pChecksIndexFilePath')) {
+            $pChecksIndexFilePathFinal = $pChecksIndexFilePath
         }
         else {
-            $pChecksIndexPathFinal = Get-pChecksIndexPath -pChecksIndexFilePath $pChecksIndexFilePath
-            $PSBoundParameters.pChecksIndexFilePath = $pChecksIndexPathFinal
+            $pChecksIndexFilePathFinal = Get-Item -Path "$PSScriptRoot\..\Index" | Select-Object -ExpandProperty FullName
         }
 
-        if (-not ($PSBoundParameters.ContainsKey('pChecksFolderPath'))) {
-            $pChecksFolderPathFinal = Get-pChecksFolderPath
-            $PSBoundParameters.Add('pChecksFolderPath', $pChecksFolderPathFinal)
+        $pCheckFromIndex = Get-pCheckFromIndex -pChecksIndexFilePath $pChecksIndexFilePathFinal
+        if (-not $pCheckFromIndex) {
+            Write-Error -Message "Couldn't load index for Checks. Aborting"
+            break
+        }
+        $getpCheckFilteredSplat = @{ }
+        #endregion
+
+        #region filter index first
+        if ($PSBoundParameters.ContainsKey('TestType')) {
+            $getpCheckFilteredSplat.TestType = $TestType
         }
         else {
-            $pChecksFolderPathFinal = Get-pChecksFolderPath -pChecksFolderPath $pChecksFolderPath
-            $PSBoundParameters.pChecksFolderPath = $pChecksFolderPathFinal
+            $getpCheckFilteredSplat.TestType = @('Simple', 'Comprehensive')
         }
-        if (-not $PSBoundParameters.ContainsKey('TestType')) {
-            $PSBoundParameters.TestType = @('Simple', 'Comprehensive')
+        if ($PSBoundParameters.ContainsKey('TestTarget')) {
+            $getpCheckFilteredSplat.TestTarget = $TestTarget
         }
-        if (-not $PSBoundParameters.ContainsKey('TestTarget')) {
-            $PSBoundParameters.TestTarget = @('Nodes', 'General')
+        else {
+            $getpCheckFilteredSplat.TestTarget = @('Nodes', 'General')
+        }
+        if ($PSBoundParameters.ContainsKey('Tag')) {
+            $getpCheckFilteredSplat.Tag = $Tag
         }
         #region if Configuration path provided - read configuration and add tag Configuration
         if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
-            $CurrentConfiguration = Import-BaselineConfiguration -BaselineConfigurationFolder $CurrentConfigurationFolderPath
-            [void]($PSBoundParameters.Remove('CurrentConfigurationFolderPath'))
-            $PSBoundParameters.Add('CurrentConfiguration', $CurrentConfiguration)
-            if($PSBoundParameters.ContainsKey('Tag')){
-                $PSBoundParameters['Tag'] = @($Tag) + @('Configuration')
+            $BaselineConfiguration = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolderPath
+            if ($getpCheckFilteredSplat.ContainsKey('Tag')) {
+                $getpCheckFilteredSplat['Tag'] = @($Tag) + @('Configuration')
             }
             else {
-                $PSBoundParameters.Add('Tag', 'Configuration')
+                $getpCheckFilteredSplat.Tag = $Tag
+            }
+        }
+        #endregion
+        #region if Tag ='Configuration' is present, import configuration
+        if ($PSBoundParameters['Tag'] -match 'Configuration') {
+            if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
+                $BaselineConfiguration = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolderPath
+            }
+            else {
+                Write-Error -Message "Please provide CurrentConfigurationFolderPath for checks"
+
             }
         }
         #endregion
 
-        #region no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
-        if (-not $PSBoundParameters.ContainsKey('NodeName') -and $PSBoundParameters['TestTarget'] -match 'Nodes') {
-            #Get All GlobalCatalogs
-            Write-Verbose "No Node provided. Querying AD for all Global Catalogs"
-            try {
-                $allGlobalCatalogs = Get-ADForest -ErrorAction Stop | Select-Object -ExpandProperty GlobalCatalogs
-            }
-            catch {
-                Write-Error -Message "$($_.Exception.Message).. Aborting all checks!"
-                Break
-            }
-            Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
-            $PSBoundParameters.Add('NodeName', @($allGlobalCatalogs))
+        #endregion
+
+        #region get all actual checks folder path
+        if ($PSBoundParameters.ContainsKey('pChecksFolderPath')) {
+            $pChecksFolderPathFinal = $pChecksFolderPath
+        }
+        else {
+            $pChecksFolderPathFinal = Get-Item -Path "$PSScriptRoot\..\Checks" | Select-Object -ExpandProperty FullName
         }
         #endregion
 
-        if($PSBoundParameters.ContainsKey('WriteToAzureLog')){
-            if(-not $PSBoundParameters.ContainsKey('Identifier')){
-                Write-Verbose -Message "No identifier for checks provided. Set it to {pChecksAD}."
-                $PSBoundParameters.Add('Identifier', 'pChecksAD')
-            }
+        #region filter index checks based provided criteria
+        $pCheckAllFiltered = ForEach ($pCheck in $pCheckFromIndex) {
+            $getpCheckFilteredSplat.pCheckObject = $pCheck
+            Get-pCheckFiltered @getpCheckFilteredSplat
         }
-        Invoke-pCheck @PSBoundParameters
+        if (-not $pCheckAllFiltered) {
+            Write-Error -Message "Couldn't filter checks with given parameters. Aborting"
+            break
+        }
+        #endregion
+
+        #region appl filtered index checks on actual file checks
+        foreach ($pCheckFiltered in $pCheckAllFiltered) {
+            $checkToProcess = Get-pCheckToProcess -pCheckObject $pCheckFiltered -pChecksFolderPath $pChecksFolderPathFinal
+            $checkToProcess
+            if (-not $checkToProcess) {
+                Write-Error -Message "Couldn't get any checks matching provided criteria. Aborting"
+                break
+            }
+            $pesterParams.Script = @{
+                Path       = $checkToProcess
+                Parameters = @{ }
+            }
+            if ($pCheckFiltered.Tag) {
+                $pesterParams.Tag = $getpCheckFilteredSplat.Tag
+            }
+
+            #region check what paramaters are required by check and provide
+            if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
+                if ($BaselineConfiguration) {
+                    $pesterParams.Script.Parameters.Add('BaselineConfiguration', $BaselineConfiguration)
+                }
+                else {
+                    Write-Error -Message "Please provide Baseline Configuration for test {$checkToProcess}"
+                }
+            }
+            if ($pCheckFiltered.Parameters -contains 'Credential') {
+                if ($PSBoundParameters.ContainsKey('Credential')) {
+                    $pesterParams.Script.Parameters.Add('Credential', $Credential)
+                }
+                else {
+                    Write-Error -Message "Please provide Credential for test {$checkToProcess}"
+                }
+            }
+            #region no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
+            if ($pCheckFiltered.TestTarget -match 'Nodes') {
+                if (-not $PSBoundParameters.ContainsKey('NodeName')) {
+                    #Get All GlobalCatalogs
+                    Write-Verbose "No Node provided. Querying AD for all Global Catalogs"
+                    try {
+                        $allGlobalCatalogs = Get-ADForest -ErrorAction Stop | Select-Object -ExpandProperty GlobalCatalogs
+                    }
+                    catch {
+                        Write-Error -Message "$($_.Exception.Message).. Aborting all checks!"
+                        Break
+                    }
+                    Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
+                    $NodesToProcess = @($allGlobalCatalogs)
+                }
+                else {
+                    $NodesToProcess = $NodeName
+                }
+
+                foreach ($node in $NodesToProcess) {
+                    Write-Verbose "Processing testTarget {Node} - {$node} with file - {$checkToProcess}"
+                    if ($PSBoundParameters.ContainsKey('OutputFolder')) {
+                        $newpCheckFileNameSplat = @{
+                            pCheckFile = $checkToProcess
+                        }
+                        $newpCheckFileNameSplat.NodeName = $node
+                        $pesterParams.OutputFile = New-pCheckFileName @newpCheckFileNameSplat
+                        Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
+
+                    }
+                    if ($pCheckFiltered.Parameters -contains 'ComputerName') {
+                        $pesterParams.Script.Parameters.ComputerName = $node
+                    }
+
+                    if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
+                        #Create baseline configuration for given TestTarget
+                        $newpChecksBaselineADSplat = @{
+                            ComputerName = $node
+                            TestTarget = 'Nodes'
+                        }
+                        if($PSBoundParameters.ContainsKey('Credential')){
+                            $newpChecksBaselineADSplat.Credential = $Credential
+                        }
+                        $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
+                        $pesterParams.Script.Parameters.Add('CurrentConfiguration', $CurrentConfiguration)
+                    }
+                    #region Perform Tests
+                    $invocationStartTime = [DateTime]::UtcNow
+                    $pesterParams
+                    #$pChecksResults = Invoke-Pester @pesterParams
+                    $invocationEndTime = [DateTime]::UtcNow
+                    #endregion
+
+
+                    #region Where to store results
+                    #region EventLog
+                    if ($PSBoundParameters.ContainsKey('WriteToEventLog')) {
+                        $pesterEventParams = @{
+                            PesterTestsResults = $pChecksResults
+                            EventSource        = $EventSource
+                            EventIDBase        = $EventIDBase
+                        }
+                        Write-Verbose -Message "Writing test results to Event Log {Application} with Event Source {$EventSource} and EventIDBase {$EventIDBase}"
+                        #Write-pChecksToEventLog @pesterEventParams
+                    }
+                    #endregion
+
+                    #region Azure Log Analytics
+                    if ($PSBoundParameters.ContainsKey('WriteToAzureLog')) {
+                        $batchId = [System.Guid]::NewGuid()
+                        $pesterALParams = @{
+                            PesterTestsResults  = $pChecksResults
+                            invocationStartTime = $invocationStartTime
+                            invocationEndTime   = $invocationEndTime
+                            Identifier          = $Identifier
+                            BatchId             = $BatchId
+                            CustomerId          = $CustomerId
+                            SharedKey           = $SharedKey
+                            Target              = $node
+                        }
+                        Write-Verbose -Message "Writing test results to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
+                        #Write-pChecksToLogAnalytics @pesterALParams
+                    }
+                    #endregion
+                    #endregion
+                }
+            }
+            #endregion
+
+
+            if ($pCheckFiltered.TestTarget -eq 'General') {
+                Write-Verbose "Processing testTarget {General} with file - {$checkToProcess}"
+                if ($PSBoundParameters.ContainsKey('OutputFolder')) {
+                    $newpCheckFileNameSplat.NodeName = 'General'
+                    $pesterParams.OutputFile = New-pCheckFileName @newpCheckFileNameSplat
+                    Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
+                }
+                try {
+                    $allGlobalCatalogs = Get-ADForest -ErrorAction Stop | Select-Object -ExpandProperty GlobalCatalogs
+                }
+                catch {
+                    Write-Error -Message "$($_.Exception.Message).. Aborting all checks!"
+                    Break
+                }
+                Write-Verbose "Will process with Node {$($allGlobalCatalogs[0])}"
+                if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
+                    #Create baseline configuration for given TestTarget
+                    $newpChecksBaselineADSplat = @{
+                        ComputerName = $allGlobalCatalogs[0]
+                        TestTarget = 'General'
+                    }
+                    if($PSBoundParameters.ContainsKey('Credential')){
+                        $newpChecksBaselineADSplat.Credential = $Credential
+                    }
+                    $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
+                    $pesterParams.Script.Parameters.Add('CurrentConfiguration', $CurrentConfiguration)
+                }
+                #region Perform Tests
+                $invocationStartTime = [DateTime]::UtcNow
+                $pesterParams
+                #$pChecksResults = Invoke-Pester @pesterParams
+                $invocationEndTime = [DateTime]::UtcNow
+                #endregion
+
+                #region Where to store results
+                #region EventLog
+                if ($PSBoundParameters.ContainsKey('WriteToEventLog')) {
+                    $pesterEventParams = @{
+                        PesterTestsResults = $pChecksResults
+                        EventSource        = $EventSource
+                        EventIDBase        = $EventIDBase
+                    }
+                    Write-Verbose -Message "Writing test results to Event Log {Application} with Event Source {$EventSource} and EventIDBase {$EventIDBase}"
+                    Write-pChecksToEventLog @pesterEventParams
+                }
+                #endregion
+
+                #region Azure Log Analytics
+                if ($PSBoundParameters.ContainsKey('WriteToAzureLog')) {
+                    $batchId = [System.Guid]::NewGuid()
+                    $pesterALParams = @{
+                        PesterTestsResults  = $pChecksResults
+                        invocationStartTime = $invocationStartTime
+                        invocationEndTime   = $invocationEndTime
+                        Identifier          = $Identifier
+                        BatchId             = $BatchId
+                        CustomerId          = $CustomerId
+                        SharedKey           = $SharedKey
+                        Target              = 'General'
+                    }
+                    Write-Verbose -Message "Writing test results to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
+                    Write-pChecksToLogAnalytics @pesterALParams
+                }
+                #endregion
+                #endregion
+            }
+            Write-Verbose -Message "Pester File {$checkToProcess} Processed type $($pCheckFiltered.TestTarget)"
+        }
     }
 }
