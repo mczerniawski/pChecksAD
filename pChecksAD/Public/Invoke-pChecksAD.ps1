@@ -208,6 +208,7 @@ function Invoke-pChecksAD {
                 Write-Error -Message "Couldn't get any checks matching provided criteria. Aborting"
                 break
             }
+            $pesterParams = @{}
             $pesterParams.Script = @{
                 Path       = $checkToProcess
                 Parameters = @{ }
@@ -228,9 +229,6 @@ function Invoke-pChecksAD {
             if ($pCheckFiltered.Parameters -contains 'Credential') {
                 if ($PSBoundParameters.ContainsKey('Credential')) {
                     $pesterParams.Script.Parameters.Add('Credential', $Credential)
-                }
-                else {
-                    Write-Error -Message "Please provide Credential for test {$checkToProcess}"
                 }
             }
             #region no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
@@ -277,7 +275,7 @@ function Invoke-pChecksAD {
                             $newpChecksBaselineADSplat.Credential = $Credential
                         }
                         $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
-                        $pesterParams.Script.Parameters.Add('CurrentConfiguration', $CurrentConfiguration)
+                        $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
                     }
                     #region Perform Tests
                     $invocationStartTime = [DateTime]::UtcNow
@@ -330,25 +328,18 @@ function Invoke-pChecksAD {
                     $pesterParams.OutputFile = New-pCheckFileName @newpCheckFileNameSplat
                     Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
                 }
-                try {
-                    $allGlobalCatalogs = Get-ADForest -ErrorAction Stop | Select-Object -ExpandProperty GlobalCatalogs
-                }
-                catch {
-                    Write-Error -Message "$($_.Exception.Message).. Aborting all checks!"
-                    Break
-                }
-                Write-Verbose "Will process with Node {$($allGlobalCatalogs[0])}"
+
                 if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
                     #Create baseline configuration for given TestTarget
-                    $newpChecksBaselineADSplat = @{
-                        ComputerName = $allGlobalCatalogs[0]
+                    $newpChecksBaselineADSplat = @{}
+                    $newpChecksBaselineADSplat =@{
                         TestTarget = 'General'
                     }
                     if($PSBoundParameters.ContainsKey('Credential')){
                         $newpChecksBaselineADSplat.Credential = $Credential
                     }
                     $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
-                    $pesterParams.Script.Parameters.Add('CurrentConfiguration', $CurrentConfiguration)
+                    $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
                 }
                 #region Perform Tests
                 $invocationStartTime = [DateTime]::UtcNow

@@ -25,6 +25,7 @@
             "TestTarget" : "Nodes",
             "Parameters" : [
                 "ComputerName",
+                "CurrentConfiguration",
                 "Credential"
             ]
         }
