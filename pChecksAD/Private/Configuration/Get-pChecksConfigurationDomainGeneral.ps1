@@ -1,6 +1,6 @@
 function Get-pChecksConfigurationDomainGeneral {
     [CmdletBinding()]
-    [OutputType([System.Collections.Hashtable])]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory,
             ParameterSetName = 'ComputerName')]

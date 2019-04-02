@@ -41,7 +41,6 @@
                    'PSUseIdenticalParametersForDSC',
                    'PSUseDeclaredVarsMoreThanAssignments',
                    'PSUseLiteralInitializerForHashtable',
-                   'PSUseOutputTypeCorrectly',
                    'PSUsePSCredentialType',
                    'PSUseShouldProcessForStateChangingFunctions',
                    'PSUseSingularNouns',

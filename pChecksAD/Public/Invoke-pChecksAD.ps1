@@ -1,5 +1,6 @@
 function Invoke-pChecksAD {
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Path to Checks Index File')]
         [ValidateScript( { Test-Path -Path $_ -PathType Leaf })]
