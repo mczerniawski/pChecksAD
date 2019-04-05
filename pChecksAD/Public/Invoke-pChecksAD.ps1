@@ -95,6 +95,7 @@ function Invoke-pChecksAD {
 
         [Parameter(Mandatory = $false, HelpMessage = 'Show Pester Tests on console',
             ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True)]
+        [ValidateSet('All','Context','Default','Describe','Failed','Fails','Header','Inconclusive','None','Passed','Pending','Skipped','Summary')]
         [String]
         $Show
     )
@@ -111,7 +112,9 @@ function Invoke-pChecksAD {
 
         #region get output file pester parameters
         if ($PSBoundParameters.ContainsKey('OutputFolder')) {
-            $newpCheckFileNameSplat.OutputFolder = $OutputFolder
+            $newpCheckFileNameSplat =@{
+                OutputFolder = $OutputFolder
+            }
             if ($PSBoundParameters.ContainsKey('FilePrefix')) {
                 $newpCheckFileNameSplat.FilePrefix = $FilePrefix
             }
@@ -156,20 +159,14 @@ function Invoke-pChecksAD {
             $getpCheckFilteredSplat.Tag = $Tag
         }
         #region if Configuration path provided - read configuration and add tag Configuration
-        if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
-            $BaselineConfiguration = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolderPath
-            if ($getpCheckFilteredSplat.ContainsKey('Tag')) {
-                $getpCheckFilteredSplat['Tag'] = @($Tag) + @('Configuration')
-            }
-            else {
-                $getpCheckFilteredSplat.Tag = $Tag
-            }
+        if ($PSBoundParameters.ContainsKey('BaselineConfigurationFolderPath')) {
+            $BaselineConfiguration = Import-pChecksBaseline -BaselineConfigurationFolder $BaselineConfigurationFolderPath
         }
         #endregion
         #region if Tag ='Configuration' is present, import configuration
         if ($PSBoundParameters['Tag'] -match 'Configuration') {
-            if ($PSBoundParameters.ContainsKey('CurrentConfigurationFolderPath')) {
-                $BaselineConfiguration = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolderPath
+            if ($PSBoundParameters.ContainsKey('BaselineConfigurationFolderPath')) {
+                $BaselineConfiguration = Import-pChecksBaseline -BaselineConfigurationFolder $BaselineConfigurationFolderPath
             }
             else {
                 Write-Error -Message "Please provide CurrentConfigurationFolderPath for checks"
@@ -203,12 +200,10 @@ function Invoke-pChecksAD {
         #region appl filtered index checks on actual file checks
         foreach ($pCheckFiltered in $pCheckAllFiltered) {
             $checkToProcess = Get-pCheckToProcess -pCheckObject $pCheckFiltered -pChecksFolderPath $pChecksFolderPathFinal
-            $checkToProcess
             if (-not $checkToProcess) {
                 Write-Error -Message "Couldn't get any checks matching provided criteria. Aborting"
                 break
             }
-            $pesterParams = @{}
             $pesterParams.Script = @{
                 Path       = $checkToProcess
                 Parameters = @{ }
@@ -253,9 +248,7 @@ function Invoke-pChecksAD {
                 foreach ($node in $NodesToProcess) {
                     Write-Verbose "Processing testTarget {Node} - {$node} with file - {$checkToProcess}"
                     if ($PSBoundParameters.ContainsKey('OutputFolder')) {
-                        $newpCheckFileNameSplat = @{
-                            pCheckFile = $checkToProcess
-                        }
+                        $newpCheckFileNameSplat.pCheckFile = $checkToProcess
                         $newpCheckFileNameSplat.NodeName = $node
                         $pesterParams.OutputFile = New-pCheckFileName @newpCheckFileNameSplat
                         Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
@@ -277,10 +270,20 @@ function Invoke-pChecksAD {
                         $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
                         $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
                     }
+
+                    if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
+                        if ($BaselineConfiguration) {
+                            $pesterParams.Script.Parameters.BaselineConfiguration = $BaselineConfiguration
+                        }
+                        else {
+                            Write-Error -Message "Please provide baseline configuration for this check {$checkToProcess}"
+                            continue
+                        }
+                    }
+
                     #region Perform Tests
                     $invocationStartTime = [DateTime]::UtcNow
-                    $pesterParams
-                    #$pChecksResults = Invoke-Pester @pesterParams
+                    $pChecksResults = Invoke-Pester @pesterParams
                     $invocationEndTime = [DateTime]::UtcNow
                     #endregion
 
@@ -294,7 +297,7 @@ function Invoke-pChecksAD {
                             EventIDBase        = $EventIDBase
                         }
                         Write-Verbose -Message "Writing test results to Event Log {Application} with Event Source {$EventSource} and EventIDBase {$EventIDBase}"
-                        #Write-pChecksToEventLog @pesterEventParams
+                        Write-pChecksToEventLog @pesterEventParams
                     }
                     #endregion
 
@@ -312,7 +315,7 @@ function Invoke-pChecksAD {
                             Target              = $node
                         }
                         Write-Verbose -Message "Writing test results to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
-                        #Write-pChecksToLogAnalytics @pesterALParams
+                        Write-pChecksToLogAnalytics @pesterALParams
                     }
                     #endregion
                     #endregion
@@ -324,6 +327,7 @@ function Invoke-pChecksAD {
             if ($pCheckFiltered.TestTarget -eq 'General') {
                 Write-Verbose "Processing testTarget {General} with file - {$checkToProcess}"
                 if ($PSBoundParameters.ContainsKey('OutputFolder')) {
+                    $newpCheckFileNameSplat.pCheckFile = $checkToProcess
                     $newpCheckFileNameSplat.NodeName = 'General'
                     $pesterParams.OutputFile = New-pCheckFileName @newpCheckFileNameSplat
                     Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
@@ -341,10 +345,19 @@ function Invoke-pChecksAD {
                     $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
                     $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
                 }
+
+                if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
+                    if ($BaselineConfiguration) {
+                        $pesterParams.Script.Parameters.BaselineConfiguration = $BaselineConfiguration
+                    }
+                    else {
+                        Write-Error -Message "Please provide baseline configuration for this check {$checkToProcess}"
+                        continue
+                    }
+                }
                 #region Perform Tests
                 $invocationStartTime = [DateTime]::UtcNow
-                $pesterParams
-                #$pChecksResults = Invoke-Pester @pesterParams
+                $pChecksResults = Invoke-Pester @pesterParams
                 $invocationEndTime = [DateTime]::UtcNow
                 #endregion
 
@@ -374,7 +387,7 @@ function Invoke-pChecksAD {
                         SharedKey           = $SharedKey
                         Target              = 'General'
                     }
-                    Write-Verbose -Message "Writing test results to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
+                    Write-Verbose -Message "Writing test results - Count {$($pesterALParams.PesterTestResults.TotalCount)} to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
                     Write-pChecksToLogAnalytics @pesterALParams
                 }
                 #endregion

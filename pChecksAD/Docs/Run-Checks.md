@@ -23,7 +23,7 @@ Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfiguration
 ## Verify proper file by importing configuration
 
 ```powershell
-$BaselineTest = Import-pChecksBaselineConfiguration -BaselineConfigurationFolder $BaselineConfigurationFolder
+$BaselineTest = Import-pChecksBaseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 
 Compare-Object -ReferenceObject $Baseline.Nodes -DifferenceObject $BaselineTest.Nodes
 foreach ($hashtable in $Baseline.General.GetEnumerator()) {

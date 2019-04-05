@@ -16,16 +16,34 @@
             ]
         },
         {
-            "DiagnosticFile" : "AD.Simple.Operational.Nodes.Tests.ps1",
+            "DiagnosticFile" : "AD.Simple.Configuration.Network.Nodes.Tests.ps1",
             "TestType" : "Simple",
             "Tag" : [
-                "Operational",
-                "Nodes"
+                "Configuration",
+                "Nodes",
+                "Teaming",
+                "Network"
             ],
             "TestTarget" : "Nodes",
             "Parameters" : [
                 "ComputerName",
-                "CurrentConfiguration",
+                "BaselineConfiguration",
+                "Credential"
+            ]
+        },
+        {
+            "DiagnosticFile" : "AD.Simple.Configuration.Basic.Nodes.Tests.ps1",
+            "TestType" : "Simple",
+            "Tag" : [
+                "Configuration",
+                "Nodes",
+                "Basic",
+                "Roles"
+            ],
+            "TestTarget" : "Nodes",
+            "Parameters" : [
+                "ComputerName",
+                "BaselineConfiguration",
                 "Credential"
             ]
         }
