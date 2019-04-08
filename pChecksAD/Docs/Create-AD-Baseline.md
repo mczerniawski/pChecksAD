@@ -86,5 +86,3 @@ $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD'
 $Baseline = New-pChecksBaselineAD @queryParams
 Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
-
-

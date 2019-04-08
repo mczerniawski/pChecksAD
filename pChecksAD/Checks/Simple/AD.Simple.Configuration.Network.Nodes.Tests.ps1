@@ -13,11 +13,11 @@ if($PSBoundParameters.ContainsKey('Credential')){
 }
 
 $pChecksSession = New-PSSession @pChecksSessionSplat
-$CurrentNodeConfiguration = $BaselineConfiguration.Nodes | Where-Object {$PSItem.ComputerName -match $ComputerName}
-Describe "Verify [host] Server {$($CurrentNodeConfiguration.ComputerName)} Full Network Adapters (Physical) Configuration Status" -Tags @('Configuration','Network') {
+$BaselineNodeConfiguration = $BaselineConfiguration.Nodes | Where-Object {$PSItem.ComputerName -match $ComputerName}
+Describe "Verify [host] Server {$($BaselineNodeConfiguration.ComputerName)} Full Network Adapters (Physical) Configuration Status" -Tags @('Configuration','Network') {
   Context "Verify Network Adapter Properties"{
     $hostNICConfiguration = Get-pChecksNetAdapterConfiguration -Physical -PSSession $pChecksSession
-    foreach ($NIC in $CurrentNodeConfiguration.NIC) {
+    foreach ($NIC in $BaselineNodeConfiguration.NIC) {
       $currentNIC = $hostNICConfiguration | Where-Object {$PSItem.Name -eq $NIC.Name}
       if($NIC.MACAddress) {
         it "Verify [host] NIC {$($NIC.Name)} MACAddress match [baseline]" {
@@ -85,11 +85,11 @@ Describe "Verify [host] Server {$($CurrentNodeConfiguration.ComputerName)} Full 
     }
   }
 }
-Describe "Verify Server {$($CurrentNodeConfiguration.ComputerName)} Teaming Configuration Status" -Tags @('Configuration','Teaming','Network') {
-  if($CurrentNodeConfiguration.Team){
+Describe "Verify Server {$($BaselineNodeConfiguration.ComputerName)} Teaming Configuration Status" -Tags @('Configuration','Teaming','Network') {
+  if($BaselineNodeConfiguration.Team){
     Context "Verify Network Team Configuration" {
       $hostTeamConfiguration = Get-pChecksTeamingConfiguration -PSSession $pChecksSession
-      foreach ($cTeam in $CurrentNodeConfiguration.Team) {
+      foreach ($cTeam in $BaselineNodeConfiguration.Team) {
         $currentTeam = $hostTeamConfiguration | Where-Object {$PSItem.Name -eq $cTeam.Name}
         it "Verify [host] Team {$($cTeam.Name)} exists" {
           $currentTeam | Should -Not -BeNullOrEmpty

@@ -79,7 +79,7 @@ Function Write-pChecksToLogAnalytics {
         Write-Verbose "Exporting $($pChecksResults.Count) results to Azure Log Analytics"
         $result = Export-LogAnalytics @exportArguments
         if($result -ne 200){
-            Write-Error -Message "Something went wrong wirh exporting to Azure Log - {$($result.ErrorCode)}"
+            Write-Error -Message "Something went wrong wirh exporting to Azure Log - {ErrorCode: $($result.ErrorCode)}"
         }
     }
     else {

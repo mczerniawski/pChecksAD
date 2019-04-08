@@ -1,6 +1,6 @@
 # how to run this
 
-A sample script that demonstrated a few options
+A sample script that demonstrates a few options
 
 ## Import modules and Create Baseline
 
@@ -8,12 +8,11 @@ A sample script that demonstrated a few options
 $creds = Get-Credential
 
 $queryParams = @{
-    ComputerName = 'objplpdc0'
+    ComputerName = 'Server-DC1'
     Credential   = $creds
 
 }
 $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD_New'
-Import-Module C:\Repos\pChecksTools\pChecksTools -Force
 Import-Module C:\Repos\pChecksAD\pChecksAD -Force
 
 $Baseline = New-pChecksBaselineAD @queryParams
@@ -22,10 +21,11 @@ Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfiguration
 
 ## Verify proper file by importing configuration
 
+If you'd like to verify if you stored configuration is correct you can easily compare it to `live` (loaded in previous step)
+
 ```powershell
 $BaselineTest = Import-pChecksBaseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 
-Compare-Object -ReferenceObject $Baseline.Nodes -DifferenceObject $BaselineTest.Nodes
 foreach ($hashtable in $Baseline.General.GetEnumerator()) {
     Compare-Object -ReferenceObject $hashtable -DifferenceObject ($BaselineTest.General.GetEnumerator() | Where-Object {$_.Name -eq $hashtable.name} )
 }
@@ -33,10 +33,12 @@ foreach ($hashtable in $Baseline.General.GetEnumerator()) {
 
 ## Run checks
 
+An example how to run checks
+
 ```powershell
 $creds = Get-Credential
-Import-Module C:\Repos\Private-GIT\pChecksTools\pChecksTools -Force
 Import-Module C:\Repos\Private-GIT\pChecksAD\pChecksAD -Force
+
 $invokepChecksSplat = @{
     #pChecksIndexFilePath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Index\AD.Checks.Index.json'
     #pChecksFolderPath = 'C:\Repos\Private-GIT\pChecksAD\pChecksAD\Checks\'
@@ -55,7 +57,7 @@ $invokepChecksSplat = @{
     #    EventSource     = 'pChecksAD'
     #    EventIDBase     = 1000
     #WriteToAzureLog = $true
-    #   Identifier          = $Identifier #Name of checks like pChecksAD
+    #   Identifier          = 'pChecksAD' #Name of checks like pChecksAD
     #   CustomerId          = 'your Customer ID in Azure Log Analytics'
     #   SharedKey           = 'your shared key in Azure Log Analytics'
 }
@@ -64,6 +66,8 @@ Invoke-pChecksAD @invokepChecksSplat
 ```
 
 ## Create ReportUnit reports
+
+An example how to create report with ReportUnit
 
 ```powershell
 Invoke-pChecksReportUnit -InputFolder $invokepChecksSplat.OutputFolder

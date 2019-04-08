@@ -258,7 +258,7 @@ function Invoke-pChecksAD {
                         $pesterParams.Script.Parameters.ComputerName = $node
                     }
 
-                    if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
+                    <# if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
                         #Create baseline configuration for given TestTarget
                         $newpChecksBaselineADSplat = @{
                             ComputerName = $node
@@ -270,6 +270,7 @@ function Invoke-pChecksAD {
                         $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
                         $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
                     }
+                    #>
 
                     if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
                         if ($BaselineConfiguration) {
@@ -333,19 +334,6 @@ function Invoke-pChecksAD {
                     Write-Verbose -Message "Results for Pester file {$checkToProcess} will be written to {$($pesterParams.OutputFile)}"
                 }
 
-                if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
-                    #Create baseline configuration for given TestTarget
-                    $newpChecksBaselineADSplat = @{}
-                    $newpChecksBaselineADSplat =@{
-                        TestTarget = 'General'
-                    }
-                    if($PSBoundParameters.ContainsKey('Credential')){
-                        $newpChecksBaselineADSplat.Credential = $Credential
-                    }
-                    $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
-                    $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
-                }
-
                 if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
                     if ($BaselineConfiguration) {
                         $pesterParams.Script.Parameters.BaselineConfiguration = $BaselineConfiguration
@@ -387,7 +375,7 @@ function Invoke-pChecksAD {
                         SharedKey           = $SharedKey
                         Target              = 'General'
                     }
-                    Write-Verbose -Message "Writing test results - Count {$($pesterALParams.PesterTestResults.TotalCount)} to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
+                    Write-Verbose -Message "Writing test results - Count {$($pesterALParams.PesterTestsResults.TotalCount)} to Azure Log CustomerID {$CustomerId} with BatchID {$BatchId} and Identifier {$Identifier}"
                     Write-pChecksToLogAnalytics @pesterALParams
                 }
                 #endregion

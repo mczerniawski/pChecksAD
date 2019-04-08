@@ -31,6 +31,8 @@ function Get-pChecksBaselineConfigurationADNode {
         $NodeConfiguration.ComputerName = ('{0}.{1}' -f $hostEnvironment.ComputerName, $hostEnvironment.Domain)
         $NodeConfiguration.Domain = $hostEnvironment.Domain
         $NodeConfiguration.Roles = Get-pChecksRolesConfiguration -PSSession $BaselinePSSession
+        #$NodeConfiguration.Services = Get-pChecksADServicesConfiguration -PSSession $BaselinePSSession
+        #$NodeConfiguration.Time = Get-pChecksTimeServiceConfiguration -PSSession $BaselinePSSession
         $NodeConfiguration.NIC = Get-pChecksNetAdapterConfiguration -PSSession $BaselinePSSession
         $NodeConfiguration.Team = Get-pChecksTeamingConfiguration -PSSession $BaselinePSSession
         $NodeConfiguration

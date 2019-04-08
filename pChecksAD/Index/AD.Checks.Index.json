@@ -1,47 +1,73 @@
 {
-    "Checks":[
+    "Checks": [
         {
-            "DiagnosticFile" : "AD.Simple.Operational.General.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
+            "DiagnosticFile": "AD.Simple.Operational.General.Tests.ps1",
+            "TestType": "Simple",
+            "Tag": [
                 "Operational",
                 "Domains",
                 "General",
-                "Sites"
+                "Sites",
+                "Password",
+                "OptionalFeature"
             ],
-            "TestTarget" : "General",
-            "Parameters" : [
-                "Credential",
-                "CurrentConfiguration"
+            "TestTarget": "General",
+            "Parameters": [
+                "Credential"
             ]
         },
         {
-            "DiagnosticFile" : "AD.Simple.Configuration.Network.Nodes.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
+            "DiagnosticFile": "AD.Simple.Operational.Nodes.Tests.ps1",
+            "TestType": "Simple",
+            "Tag": [
+                "Operational",
+                "Nodes",
+                "Services"
+            ],
+            "TestTarget": "Nodes",
+            "Parameters": [
+                "ComputerName",
+                "Credential"
+            ]
+        },
+        {
+            "DiagnosticFile": "AD.Simple.Configuration.General.Tests.ps1",
+            "TestType": "Simple",
+            "Tag": [
+                "Configuration"
+            ],
+            "TestTarget": "General",
+            "Parameters": [
+                "Credential"
+            ]
+        },
+        {
+            "DiagnosticFile": "AD.Simple.Configuration.Network.Nodes.Tests.ps1",
+            "TestType": "Simple",
+            "Tag": [
                 "Configuration",
                 "Nodes",
                 "Teaming",
                 "Network"
             ],
-            "TestTarget" : "Nodes",
-            "Parameters" : [
+            "TestTarget": "Nodes",
+            "Parameters": [
                 "ComputerName",
                 "BaselineConfiguration",
                 "Credential"
             ]
         },
         {
-            "DiagnosticFile" : "AD.Simple.Configuration.Basic.Nodes.Tests.ps1",
-            "TestType" : "Simple",
-            "Tag" : [
+            "DiagnosticFile": "AD.Simple.Configuration.Basic.Nodes.Tests.ps1",
+            "TestType": "Simple",
+            "Tag": [
                 "Configuration",
                 "Nodes",
                 "Basic",
                 "Roles"
             ],
-            "TestTarget" : "Nodes",
-            "Parameters" : [
+            "TestTarget": "Nodes",
+            "Parameters": [
                 "ComputerName",
                 "BaselineConfiguration",
                 "Credential"
