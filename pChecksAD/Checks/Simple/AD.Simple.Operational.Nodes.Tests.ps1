@@ -51,7 +51,7 @@ Describe "Verify Active Directory services on domain controller {$ComputerName)}
             }
         }
         #If virtual it should allow time sync with integration services only on startup
-        $ComputerSystem = Invoke-Command @pChecksSession -ScriptBlock { Get-WmiObject -Class win32_computersystem }
+        $ComputerSystem = Invoke-Command @pChecksSession -ScriptBlock { Get-CimInstance -Class win32_computersystem }
         if($ComputerSystem.Model -match 'Virtual') {
             IT "Time Sync with build in provider should occur only on startup" {
                 $VMICTimeProvider = Invoke-Command @pChecksSession -ScriptBlock {
