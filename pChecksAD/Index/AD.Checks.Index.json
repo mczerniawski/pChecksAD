@@ -34,10 +34,18 @@
             "DiagnosticFile": "AD.Simple.Configuration.General.Tests.ps1",
             "TestType": "Simple",
             "Tag": [
-                "Configuration"
+                "Configuration",
+                "Configuration-General",
+                "Configuration-Forest",
+                "Configuration-Domains",
+                "Configuration-Sites",
+                "Configuration-Trusts",
+                "Configuration-GlobalCatalogs"
+
             ],
             "TestTarget": "General",
             "Parameters": [
+                "BaselineConfiguration",
                 "Credential"
             ]
         },
@@ -46,9 +54,9 @@
             "TestType": "Simple",
             "Tag": [
                 "Configuration",
-                "Nodes",
-                "Teaming",
-                "Network"
+                "Configuration-Nodes",
+                "Configuration-Teaming",
+                "Configuration-Network"
             ],
             "TestTarget": "Nodes",
             "Parameters": [
@@ -62,9 +70,9 @@
             "TestType": "Simple",
             "Tag": [
                 "Configuration",
-                "Nodes",
-                "Basic",
-                "Roles"
+                "Configuration-Nodes",
+                "Configuration-Basic",
+                "Configuration-Roles"
             ],
             "TestTarget": "Nodes",
             "Parameters": [

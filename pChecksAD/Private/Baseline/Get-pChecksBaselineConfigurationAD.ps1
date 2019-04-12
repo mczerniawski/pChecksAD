@@ -91,7 +91,7 @@ function Get-pChecksBaselineConfigurationAD {
         if ($PSBoundParameters.ContainsKey('Credential')) {
             $lastBackupQuery.Credential = $Credential
         }
-        #$ForestConfig.Backup = Get-pChecksConfigurationDomainLastBackup @lastBackupQuery
+        $ForestConfig.Backup = Get-pChecksConfigurationDomainLastBackup @lastBackupQuery
 
         $ForestConfig
     }

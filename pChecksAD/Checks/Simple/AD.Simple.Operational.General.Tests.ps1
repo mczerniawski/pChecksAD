@@ -10,7 +10,7 @@ if ($PSBoundParameters.ContainsKey('Credential')) {
 }
 $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
 
-Describe "Verify Active Directory services from domain controller {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'General') {
+Describe "Verify Active Directory [Services] from domain controller {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'General') {
     @($CurrentConfiguration.General.GlobalCatalogs.Name).Foreach{
         $queryCheckParams = @{
             Server = $PSitem
@@ -18,20 +18,20 @@ Describe "Verify Active Directory services from domain controller {$($CurrentCon
         if ($PSBoundParameters.ContainsKey('Credential')) {
             $queryCheckParams.Credential = $Credential
         }
-        Context "Verify {$PSitem} connectivity in forest {$($CurrentConfiguration.General.Name)}" {
+        Context "Verify {$PSitem} [Connectivity] in forest {$($CurrentConfiguration.General.Name)}" {
             It "Verify Domain Controller {$PSItem} is [online]" {
                 Test-Connection $PSItem -Count 1 -ErrorAction SilentlyContinue |
                 Should -Be $true
             }
-            It "Verify DNS on Domain Controller {$PSItem} resolves current host name" {
+            It "Verify DNS on Domain Controller {$PSItem} [resolves current host name]" {
                 Resolve-DnsName -Name $($env:computername) -Server $PSItem  |
                 Should -Not -BeNullOrEmpty
             }
-            It "Verify Domain Controller {$PSItem} responds to PowerShell Queries" {
+            It "Verify Domain Controller {$PSItem} [responds to PowerShell Queries]" {
                 Get-ADDomainController @queryCheckParams |
                 Should -Not -BeNullOrEmpty
             }
-            It "Verify Domain Controller {$PSItem} has no replication failures" {
+            It "Verify Domain Controller {$PSItem} has [no replication failures]" {
                 (Get-ADReplicationFailure -Target $PSItem -Credential $Credential) | ForEach-Object {
                     $PSItem.FailureCount |
                     Should -Be 0
@@ -48,7 +48,7 @@ Describe "Verify domains configuration in forest {$($CurrentConfiguration.Genera
         if ($PSBoundParameters.ContainsKey('Credential')) {
             $queryCheckParams.Credential = $Credential
         }
-        Context "Verify Crucial Groups membership" {
+        Context "Verify [High Groups membership]" {
             @($PSItem.HighGroups).Foreach{
                 It "Verify [$($PSItem.Name)] group should only contain [Administrator] account" {
                     Get-ADGroupMember -Identity $PSItem.Name @queryCheckParams | Where-Object { $PSItem.samaccountname -ne 'Administrator' } |
@@ -57,7 +57,7 @@ Describe "Verify domains configuration in forest {$($CurrentConfiguration.Genera
             }
         }
         Context "Verify DHCP servers configured" {
-            It "Verify at least one DHCP authorized in domain" {
+            It "Verify at least one DHCP [authorized] in domain" {
                 $PSItem.DHCPservers |
                 Should -Not -BeNullOrEmpty -Because 'It is good to have at least one DHCP authorized'
             }
@@ -70,7 +70,7 @@ Describe "Verify domains configuration in forest {$($CurrentConfiguration.Genera
         }
     }
 }
-Describe "Verify sites configuration in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Sites') {
+Describe "Verify [sites configuration] in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Sites') {
     @($CurrentConfiguration.General.Sites).Foreach{
         Context "Verify site {$($PSItem.Name)} configuration" {
             It "Should have at least one subnet configured" {
@@ -80,7 +80,7 @@ Describe "Verify sites configuration in forest {$($CurrentConfiguration.General.
         }
     }
 }
-Describe "Verify backup status in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Backup') {
+Describe "Verify [backup status] in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Backup') {
     @($CurrentConfiguration.General.Backup).Foreach{
         It  "Verify Global Catalog {$($PSItem.DomainController)} last backup time should be less than [7] days ago" {
             [datetime]$PSItem.LastOriginatingChangeTime |
