@@ -57,9 +57,9 @@ $invokepChecksSplat = @{
     #    EventSource     = 'pChecksAD'
     #    EventIDBase     = 1000
     #WriteToAzureLog = $true
-    #   Identifier          = 'pChecksAD' #Name of checks like pChecksAD
-    #   CustomerId          = 'your Customer ID in Azure Log Analytics'
-    #   SharedKey           = 'your shared key in Azure Log Analytics'
+    #   Identifier          = 'pChecksAD' #Name of table in Log Analytics  i.e. pChecksAD
+    #   CustomerId          = '' # your workspaceID in Azure Log Analytics
+    #   SharedKey           = '' # PrimaryKey for given Workspace
 }
 
 Invoke-pChecksAD @invokepChecksSplat

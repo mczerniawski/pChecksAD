@@ -2,7 +2,7 @@
 
 ## Compare change results in time
 
-```
+```KQL
 let Passed = (
 pChecksAD_CL
 | where TimeGenerated  > ago(7d) and Passed_b == 'True'
@@ -31,7 +31,7 @@ Passed | join kind=inner Failed on Name_s
 
 ## Passed and failed checks
 
-```
+```KQL
 pChecksAD_CL
 | where TimeGenerated > ago(7d)
 | extend DayGenerated = startofday(TimeGenerated)
@@ -86,7 +86,7 @@ pChecksAD_CL
 
 ## Passed and failed statistics
 
-```
+```KQL
 pChecksAD_CL
 | where TimeGenerated > ago(7d)
 | summarize ChecksPassed = (count(Passed_b == 'True')),
@@ -94,4 +94,3 @@ pChecksAD_CL
          by Describe_s
 | sort by ChecksFailed
 ```
-

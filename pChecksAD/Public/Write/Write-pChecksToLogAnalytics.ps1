@@ -65,13 +65,13 @@ Function Write-pChecksToLogAnalytics {
                 Name                = $testResult.Name
                 FailureMessage      = $testResult.FailureMessage
                 Result              = $testResult.Result
-                Identifier          = $Identifier
+                Identifier          = $ALTableIdentifier
             }
         }
         $exportArguments = @{
             CustomerId     = $CustomerId
             SharedKey      = $SharedKey
-            LogType        = $Identifier
+            LogType        = $ALTableIdentifier
             TimeStampField = $invocationStartTime
             pChecksResults = $pChecksResults
         }
@@ -79,7 +79,7 @@ Function Write-pChecksToLogAnalytics {
         Write-Verbose "Exporting $($pChecksResults.Count) results to Azure Log Analytics"
         $result = Export-LogAnalytics @exportArguments
         if($result -ne 200){
-            Write-Error -Message "Something went wrong wirh exporting to Azure Log - {ErrorCode: $($result.ErrorCode)}"
+            Write-Error -Message "Something went wrong with exporting to Azure Log - {ErrorCode: $($result.ErrorCode)}"
         }
     }
     else {

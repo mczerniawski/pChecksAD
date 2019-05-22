@@ -24,7 +24,7 @@ Connect-AzureRmAccount
 #Select subscription where Log Analytics workspace should be created
 Get-AzureRmSubscription | Out-GridView -PassThru | Select-AzureRmSubscription
 
-$resourceGroupName = 'RG-LogAnalytics'
+$resourceGroupName = 'RG-pChecks'
 $Location = 'westeurope'
 $workspaceSKU = 'standalone'
 $workspaceName = 'LA-pChecks'
@@ -67,9 +67,20 @@ $PrimarySharedKey = Get-AzureRmOperationalInsightsWorkspaceSharedKeys -ResourceG
 $PrimarySharedKey
 ```
 
-# Get Customer ID
+## Get Customer ID
 
 ```powershell
 $CustomerID = Get-AzureRmOperationalInsightsWorkspace -ResourceGroupName $resourceGroupName -Name $workspaceName | Select-Object -ExpandProperty CustomerId | Select-Object -ExpandProperty Guid
 $CustomerID
 ```
+
+## (Optional) Export WorkspaceData to disk for later import
+
+```powershell
+$WorkspaceDataPath = 'c:\AdminTools\Workspace.dat'
+$WorkspaceData = @{
+    PrimarySharedKey = $PrimarySharedKey
+    CustomerID = $CustomerID
+}
+
+$WorkspaceData | Export-CLIXml -path $WorkspaceDataPath

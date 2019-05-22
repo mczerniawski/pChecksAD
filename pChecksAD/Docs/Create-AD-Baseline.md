@@ -4,7 +4,8 @@
 
 You will need to have this and [pChecksTools](https://github.com/mczerniawski/pChecksTools) installed/downloaded and imported into your session.
 
-Also RSAT module for AD/DNS cmdlets. Grab it using
+Also RSAT module for AD/DNS cmdlets. Grab it using:
+
 - [choco](https://chocolatey.org/install) : `choco install rsat`
 - or PowerShell
 
@@ -16,16 +17,15 @@ Update-Help
 - Installation is quite easy:
 
 ```powershell
-Install-Module pChecksTools -Scope User
 Install-Module pChecksAD -Scope User
 ```
 
 - Importing isn't rocket science either:
 
 ```powershell
-Import-Module pChecksTools -Force
 Import-Module pChecksAD -Force
 ```
+
 ## Run
 
 To get all details you will need domain credentials and domain controller to query.
@@ -65,16 +65,15 @@ This will create a folder structure:
 ```
 
 where:
+
 - `Nodes` will contain configuration of each node (Domain Controller)
 - `General` will contain service (Forest,Domain) configuration
 
-
-# Full code
+## Full code
 
 Below is just code to create the baseline
 
 ```powershell
-Import-Module pChecksTools -Force
 Import-Module pChecksAD -Force
 $Credential = Get-Credential
 $queryParams = @{
