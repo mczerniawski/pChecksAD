@@ -65,13 +65,13 @@ Function Write-pChecksToLogAnalytics {
                 Name                = $testResult.Name
                 FailureMessage      = $testResult.FailureMessage
                 Result              = $testResult.Result
-                Identifier          = $ALTableIdentifier
+                Identifier          = $Identifier
             }
         }
         $exportArguments = @{
             CustomerId     = $CustomerId
             SharedKey      = $SharedKey
-            LogType        = $ALTableIdentifier
+            LogType        = $Identifier
             TimeStampField = $invocationStartTime
             pChecksResults = $pChecksResults
         }
