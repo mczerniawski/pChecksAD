@@ -197,7 +197,7 @@ function Invoke-pChecksAD {
         }
         #endregion
 
-        #region appl filtered index checks on actual file checks
+        #region apply filtered index checks on actual file checks
         foreach ($pCheckFiltered in $pCheckAllFiltered) {
             $checkToProcess = Get-pCheckToProcess -pCheckObject $pCheckFiltered -pChecksFolderPath $pChecksFolderPathFinal
             if (-not $checkToProcess) {
@@ -226,8 +226,11 @@ function Invoke-pChecksAD {
                     $pesterParams.Script.Parameters.Add('Credential', $Credential)
                 }
             }
-            #region no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
+            #endregion
+
+            #region Node tests.
             if ($pCheckFiltered.TestTarget -match 'Nodes') {
+                #region If no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
                 if (-not $PSBoundParameters.ContainsKey('NodeName')) {
                     #Get All GlobalCatalogs
                     Write-Verbose "No Node provided. Querying AD for all Global Catalogs"
@@ -241,6 +244,7 @@ function Invoke-pChecksAD {
                     Write-Verbose "Will process with Nodes {$($allGlobalCatalogs -join (','))}"
                     $NodesToProcess = @($allGlobalCatalogs)
                 }
+                #endregion
                 else {
                     $NodesToProcess = $NodeName
                 }
@@ -257,20 +261,6 @@ function Invoke-pChecksAD {
                     if ($pCheckFiltered.Parameters -contains 'ComputerName') {
                         $pesterParams.Script.Parameters.ComputerName = $node
                     }
-
-                    <# if ($pCheckFiltered.Parameters -contains 'CurrentConfiguration') {
-                        #Create baseline configuration for given TestTarget
-                        $newpChecksBaselineADSplat = @{
-                            ComputerName = $node
-                            TestTarget = 'Nodes'
-                        }
-                        if($PSBoundParameters.ContainsKey('Credential')){
-                            $newpChecksBaselineADSplat.Credential = $Credential
-                        }
-                        $CurrentConfiguration = New-pChecksBaselineAD @newpChecksBaselineADSplat
-                        $pesterParams.Script.Parameters.CurrentConfiguration = $CurrentConfiguration
-                    }
-                    #>
 
                     if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
                         if ($BaselineConfiguration) {
@@ -319,12 +309,10 @@ function Invoke-pChecksAD {
                         Write-pChecksToLogAnalytics @pesterALParams
                     }
                     #endregion
-                    #endregion
                 }
             }
-            #endregion
 
-
+            #region General tests
             if ($pCheckFiltered.TestTarget -eq 'General') {
                 Write-Verbose "Processing testTarget {General} with file - {$checkToProcess}"
                 if ($PSBoundParameters.ContainsKey('OutputFolder')) {
@@ -349,7 +337,7 @@ function Invoke-pChecksAD {
                 $invocationEndTime = [DateTime]::UtcNow
                 #endregion
 
-                #region Where to store results
+                #Where to store results
                 #region EventLog
                 if ($PSBoundParameters.ContainsKey('WriteToEventLog')) {
                     $pesterEventParams = @{
@@ -379,8 +367,9 @@ function Invoke-pChecksAD {
                     Write-pChecksToLogAnalytics @pesterALParams
                 }
                 #endregion
-                #endregion
+
             }
+            #endregion
             Write-Verbose -Message "Pester File {$checkToProcess} Processed type $($pCheckFiltered.TestTarget)"
         }
     }

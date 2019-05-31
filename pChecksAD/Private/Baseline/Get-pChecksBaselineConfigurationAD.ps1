@@ -84,6 +84,7 @@ function Get-pChecksBaselineConfigurationAD {
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Trust configuration" -PercentComplete 80
         $ForestConfig.Trusts = Get-pChecksConfigurationDomainTrust  @queryParams
         #endregion
+        #region Backup properties
         Write-Progress -Activity 'Gathering AD Forest configuration' -Status "Get Forest {$($ForestConfig.Name)} Backup information" -PercentComplete 90
         $lastBackupQuery = @{
             ComputerName = $ForestConfig.GlobalCatalogs.Name
@@ -92,7 +93,7 @@ function Get-pChecksBaselineConfigurationAD {
             $lastBackupQuery.Credential = $Credential
         }
         $ForestConfig.Backup = Get-pChecksConfigurationDomainLastBackup @lastBackupQuery
-
+        #endregion
         $ForestConfig
     }
 }

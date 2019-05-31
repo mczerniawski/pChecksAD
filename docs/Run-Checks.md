@@ -1,6 +1,6 @@
-# how to run this
+# Run Examples of pChecksAD
 
-A sample script that demonstrates a few options
+A sample scripts that demonstrates a few options
 
 ## Import modules and Create Baseline
 

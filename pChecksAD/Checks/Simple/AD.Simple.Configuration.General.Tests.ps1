@@ -161,5 +161,3 @@ Describe "Verify Active Directory Forest [Current Global Catalogs] configuration
         }
     }
 }
-
-

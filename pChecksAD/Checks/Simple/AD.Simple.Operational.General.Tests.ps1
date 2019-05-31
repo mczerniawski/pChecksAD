@@ -86,7 +86,6 @@ Describe "Verify [backup status] in forest {$($CurrentConfiguration.General.Name
             [datetime]$PSItem.LastOriginatingChangeTime |
             Should -BeGreaterOrEqual ((Get-Date).AddDays(-7))
         }
-
     }
 }
 Describe "Verify domains configuration in forest {$($CurrentConfiguration.General.Name)}" -Tags @('Operational', 'Password') {
@@ -139,27 +138,3 @@ Describe "Verify Optional Feature in forest {$($CurrentConfiguration.General.Nam
         }
     }
 }
-#Describe "Verify configuration for DFSR" -Tags @('Operational', 'DFSR') {
-   <#  $domainLevel =
-    Get- DFSR state = Should Exist AD:\CN=Topology,CN=Domain System Volume,CN=DFSR-GlobalSettings,CN=System,DC=objectivity,DC=co,DC=uk>
-    Get replication issues
-
-   #>
-#}
-
-<#
-Describe "Verify proper settings" {
-    #if functional level 2008
-    it "DFS Replication is set up" {
-
-    }
-    #if functional level 2008r2
-    it "Recycle bin enabled" {
-        Get-ADOptionalFeature -Filter 'name -like "Recycle Bin Feature"' | Select-Object EnabledScopes | Should -Not -BeNullOrEmpty
-    }
-    #if 2016
-    it "DCs can support rolling of NTLM "
-
-
-}
-#>

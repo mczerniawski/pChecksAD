@@ -1,34 +1,6 @@
 # How to create initial AD Baseline
 
-## Requirements
-
-You will need to have this and [pChecksTools](https://github.com/mczerniawski/pChecksTools) installed/downloaded and imported into your session.
-
-Also RSAT module for AD/DNS cmdlets. Grab it using:
-
-- [choco](https://chocolatey.org/install) : `choco install rsat`
-- or PowerShell
-
-```powershell
-Get-WindowsCapability -Name RSAT* -Online | Add-WindowsCapability -Online
-Update-Help
-```
-
-- Installation is quite easy:
-
-```powershell
-Install-Module pChecksAD -Scope User
-```
-
-- Importing isn't rocket science either:
-
-```powershell
-Import-Module pChecksAD -Force
-```
-
-## Run
-
-To get all details you will need domain credentials and domain controller to query.
+- To get all details you will need domain credentials and domain controller to query.
 
 ```powershell
 $Credential = Get-Credential
@@ -48,6 +20,7 @@ $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD'
 - and finally export:
 
 ```powershell
+Import-Module  pChecksAD -Force
 $Baseline = New-pChecksBaselineAD @queryParams
 Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
@@ -85,3 +58,4 @@ $BaselineConfigurationFolder = 'C:\AdminTools\Tests\BaselineAD'
 $Baseline = New-pChecksBaselineAD @queryParams
 Export-pChecksBaselineAD -BaselineConfiguration $Baseline -BaselineConfigurationFolder $BaselineConfigurationFolder
 ```
+

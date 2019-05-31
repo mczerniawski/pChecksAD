@@ -62,10 +62,3 @@ Describe "Verify Active Directory services on domain controller {$ComputerName)}
         }
     }
 }
-<#
-
-Describe "Firewall settings" {
-
-}
-#>
-
