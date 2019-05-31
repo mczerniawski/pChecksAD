@@ -11,9 +11,9 @@
 <!-- TOC -->
 - [What is pChecksAD](#What-is-pChecksAD)
 - [Install required modules](#Install-requirements)
-- [How to Create initial AD baseline](docs\Create-AD-Baseline.md)
-- [How to Create Azure Log Worksapce](docs\Create-AzureLog-Workspace.md)
-- [Run Examples](docs\Run-Checks.md)
+- [How to Create initial AD baseline](https://github.com/mczerniawski/pChecksAD/blob/master/docs/Create-AD-Baseline.md)
+- [How to Create Azure Log Worksapce](https://github.com/mczerniawski/pChecksAD/blob/master/docs/Create-AzureLog-Workspace.md)
+- [Run Examples](https://github.com/mczerniawski/pChecksAD/blob/master/docs/Run-Checks.md)
 <!-- /TOC -->
 
 # What is pChecksAD
