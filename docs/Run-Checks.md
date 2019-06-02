@@ -138,9 +138,8 @@ $invokepChecksSplat = @{
     Show            = 'All'
     WriteToAzureLog = $true
        Identifier   = 'pChecksAD'
-       CustomerId   = 'e2920363-b001-482a-adfc-740e696ff801'
-       SharedKey    = 'cGNQmJJ/8E7ea9Cl/AnXGTHFiMfrzbZgPC24ShjaW4pOrJVLSCQYFIAdN00cjfR/PvDXABfxLf2ypcHlm5zq7A=='
-}
+       CustomerId   = 'e2920363-xxxx-740e696ff801'
+       SharedKey    = 'cGNQmJJ/OrJVLSCQYFIAdN00cjfR/PvDXABfxLf2ypcHlm5zq7A=='}
 Invoke-pChecksAD @invokepChecksSplat
 #endregion
 ```
@@ -168,8 +167,8 @@ $invokepChecksSplat = @{
         EventIDBase     = 1000
     WriteToAzureLog = $true
        Identifier          = 'pChecksAD'
-       CustomerId          = 'e2920363-b001-482a-adfc-740e696ff801'
-       SharedKey           = 'cGNQmJJ/8E7ea9Cl/AnXGTHFiMfrzbZgPC24ShjaW4pOrJVLSCQYFIAdN00cjfR/PvDXABfxLf2ypcHlm5zq7A=='
+       CustomerId          = 'e2920363-xxxx-740e696ff801'
+       SharedKey           = 'cGNQmJJ/OrJVLSCQYFIAdN00cjfR/PvDXABfxLf2ypcHlm5zq7A=='
 }
 #endregion
 ```
