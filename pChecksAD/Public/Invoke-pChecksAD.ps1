@@ -211,7 +211,6 @@ function Invoke-pChecksAD {
             if ($pCheckFiltered.Tag) {
                 $pesterParams.Tag = $getpCheckFilteredSplat.Tag
             }
-
             #region check what paramaters are required by check and provide
             if ($pCheckFiltered.Parameters -contains 'BaselineConfiguration') {
                 if ($BaselineConfiguration) {
@@ -227,7 +226,6 @@ function Invoke-pChecksAD {
                 }
             }
             #endregion
-
             #region Node tests.
             if ($pCheckFiltered.TestTarget -match 'Nodes') {
                 #region If no NodeName provided and TestTarget set for Nodes - 'query for all Global Catalogs'
@@ -248,7 +246,7 @@ function Invoke-pChecksAD {
                 else {
                     $NodesToProcess = $NodeName
                 }
-
+                #region Node tests
                 foreach ($node in $NodesToProcess) {
                     Write-Verbose "Processing testTarget {Node} - {$node} with file - {$checkToProcess}"
                     if ($PSBoundParameters.ContainsKey('OutputFolder')) {
@@ -309,9 +307,11 @@ function Invoke-pChecksAD {
                         Write-pChecksToLogAnalytics @pesterALParams
                     }
                     #endregion
+                    #endregion
+                    #endregion
                 }
             }
-
+            #endregion
             #region General tests
             if ($pCheckFiltered.TestTarget -eq 'General') {
                 Write-Verbose "Processing testTarget {General} with file - {$checkToProcess}"
@@ -337,7 +337,7 @@ function Invoke-pChecksAD {
                 $invocationEndTime = [DateTime]::UtcNow
                 #endregion
 
-                #Where to store results
+                #region Where to store results
                 #region EventLog
                 if ($PSBoundParameters.ContainsKey('WriteToEventLog')) {
                     $pesterEventParams = @{
@@ -367,10 +367,12 @@ function Invoke-pChecksAD {
                     Write-pChecksToLogAnalytics @pesterALParams
                 }
                 #endregion
+                #endregion
 
             }
             #endregion
             Write-Verbose -Message "Pester File {$checkToProcess} Processed type $($pCheckFiltered.TestTarget)"
         }
+        #endregion
     }
 }
