@@ -48,7 +48,8 @@ Import-Module Pester -force
 
 $Credential = Import-Clixml -Path C:\admintools\Creds.xml
 $queryParams = @{
-    ComputerName  = Get-ADDomainController -Discover -Service PrimaryDC | Select-Object -ExpandProperty HostName
+    #IF Provided will query only this computer!
+    #ComputerName  = Get-ADDomainController -Discover -Service PrimaryDC | Select-Object -ExpandProperty HostName
     Credential = $Credential
 
 }
@@ -118,7 +119,7 @@ Invoke-pChecksAD @invokepChecksSplat
 #region Configuration Checks
 $invokepChecksSplat = @{
     Tag             = @('Configuration')
-    CurrentConfigurationFolderPath = $BaselineConfigurationFolder
+    BaselineConfigurationFolderPath = $BaselineConfigurationFolder
     Verbose         = $true
     Credential      = $Credential
     Show            = 'All'
@@ -160,7 +161,7 @@ $invokepChecksSplat = @{
     OutputFolder = $ReportsFolder
     Verbose = $true
     Credential      = $Credential
-    CurrentConfigurationFolderPath = 'C:\AdminTools\Tests\BaselineAD_New' #Adding this means adding tag 'Configuration' $Tag +='Configuration'
+    BaselineConfigurationFolderPath = 'C:\AdminTools\Tests\BaselineAD_New' #Adding this means adding tag 'Configuration' $Tag +='Configuration'
     Show            = 'All'
     WriteToEventLog = $true
         EventSource     = 'pChecksAD'

@@ -44,7 +44,7 @@ function New-pChecksBaselineAD {
             $NodesToProcess = @($allGlobalCatalogs)
         }
         else {
-            $NodesToProcess = $NodeName
+            $NodesToProcess = $ComputerName
         }
 
         if(-not $PSBoundParameters.ContainsKey('TestTarget')){

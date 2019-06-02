@@ -141,7 +141,7 @@ function Get-pChecksNetAdapterConfiguration {
                     $interfaceProperties.NetAdapterRDMA.Enabled = $NetAdapterRSS.Enabled
                 }
                 if ($NetAdapterAdvancedProperty) {
-                    $RegistryKeywords = @('*FlowControl', '*JumboPacket')
+                    $RegistryKeywords = @('*JumboPacket')
                     $interfaceProperties.NetAdapterAdvancedProperty += foreach ($rKey in $RegistryKeywords) {
                         $output = @{}
                         $entry = $NetAdapterAdvancedProperty | Where-Object {$PSItem.RegistryKeyword -eq $rKey}
