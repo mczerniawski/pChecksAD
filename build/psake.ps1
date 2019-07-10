@@ -80,7 +80,7 @@ Task StaticCodeAnalysis {
         $scriptStylePath = "$PSScriptRoot\ScriptingStyle.psd1"
     }
     "Running PSScriptAnalyzer using file '$scriptStylePath'"
-    $Results = Invoke-ScriptAnalyzer -Path $ProjectRoot -Recurse -Settings $scriptStylePath
+    $Results = Invoke-ScriptAnalyzer -Path $ENV:BHModulePath -Recurse -Settings $scriptStylePath
     if ($Results) {
         $ResultString = $Results | Out-String
         Write-Warning $ResultString
